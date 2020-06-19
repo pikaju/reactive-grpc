@@ -1,6 +1,6 @@
 {
-  "name": "grpc-rxjs",
-  "description": "RxJS wrapper for gRPC files generated with ts-protoc-gen.",
+  "name": "reactive-grpc",
+  "description": "RxJS wrapper for gRPC and TypeScript.",
   "version": "0.0.1",
   "author": {
     "name": "Julien Scholz",
