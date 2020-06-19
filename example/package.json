@@ -5,7 +5,20 @@
     "name": "Julien Scholz",
     "email": "julienscholzo@hotmail.de"
   },
+  "files": [
+    "src/**/*",
+    "generated/**/*"
+  ],
+  "scripts": {
+    "generate": "./generate.sh"
+  },
   "dependencies": {
     "grpc-rxjs": "file:../"
+  },
+  "devDependencies": {
+    "grpc-tools": "^1.9.0",
+    "grpc_tools_node_protoc_ts": "^4.0.0",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.5"
   }
 }
