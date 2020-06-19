@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+service Example {
+  rpc AddTwoNumbers(TwoNumbers) returns (OneNumber);
+  rpc AddStreamOfNumbers(stream OneNumber) returns (OneNumber);
+  rpc GetFibonacciSequence(Empty) returns (stream OneNumber);
+  rpc RunningAverage(stream OneNumber) returns (stream OneNumber);
+}
+
+message Empty {
+}
+
+message OneNumber {
+  float a = 1;
+}
+
+message TwoNumbers {
+  float a = 1;
+  float b = 2;
+}
+
+
