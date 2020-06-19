@@ -1,11 +1,31 @@
 {
   "name": "grpc-rxjs",
+  "description": "RxJS wrapper for gRPC files generated with ts-protoc-gen.",
   "version": "0.0.1",
   "author": {
     "name": "Julien Scholz",
     "email": "julienscholzo@hotmail.de"
   },
+  "files": [
+    "build/**/*"
+  ],
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "format": "prettier --write \"lib/**/*.ts\"",
+    "lint": "tslint -p tsconfig.json",
+    "build": "yarn run tsc",
+    "prepare": "yarn run build",
+    "prepublishOnly": "yarn run lint"
+  },
   "dependencies": {
+    "grpc": "^1.24.3",
     "rxjs": "^6.5.5"
+  },
+  "devDependencies": {
+    "prettier": "^2.0.5",
+    "tslint": "^6.1.2",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.9.5"
   }
 }
