@@ -4,5 +4,8 @@
   "author": {
     "name": "Julien Scholz",
     "email": "julienscholzo@hotmail.de"
+  },
+  "dependencies": {
+    "rxjs": "^6.5.5"
   }
 }
