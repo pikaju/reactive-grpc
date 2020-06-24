@@ -10,7 +10,7 @@
     "generated/**/*"
   ],
   "scripts": {
-    "generate": "./generate.sh"
+    "generate": "bash generate.sh"
   },
   "dependencies": {
     "grpc-rxjs": "file:../"
