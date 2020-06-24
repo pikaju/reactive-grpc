@@ -1,1 +1,1 @@
-# RxJS wrapper for ts-protoc-gen
+# RxJS wrapper for gRPC and TypeScript
