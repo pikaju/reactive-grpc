@@ -1,5 +1,5 @@
 {
-  "name": "grpc-rxjs-example",
+  "name": "reactive-grpc-example",
   "version": "0.0.1",
   "author": {
     "name": "Julien Scholz",
@@ -13,7 +13,7 @@
     "generate": "bash generate.sh"
   },
   "dependencies": {
-    "grpc-rxjs": "file:../"
+    "reactive-grpc": "file:../"
   },
   "devDependencies": {
     "grpc-tools": "^1.9.0",
