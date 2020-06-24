@@ -1,7 +1,7 @@
 import { ExampleService, IExampleServer } from './generated/service_grpc_pb';
-import { reactifyService } from 'grpc-rxjs';
+import { defineService } from 'grpc-rxjs';
 
-reactifyService<IExampleServer>(ExampleService, {
+defineService<IExampleServer>(ExampleService, {
   addTwoNumbers() {
 
   }
