@@ -2,19 +2,27 @@ import * as grpc from "grpc";
 import { Observable } from "rxjs";
 
 export type ReactiveUnaryMethod<RequestType, ResponseType> = (
-  request: RequestType
+  request: RequestType,
+  metadata?: grpc.Metadata,
+  canceled?: boolean,
 ) => Promise<ResponseType>;
 
 export type ReactiveClientStreamMethod<RequestType, ResponseType> = (
-  request: Observable<RequestType>
+  request: Observable<RequestType>,
+  metadata?: grpc.Metadata,
+  canceled?: boolean,
 ) => Promise<ResponseType>;
 
 export type ReactiveServerStreamMethod<RequestType, ResponseType> = (
-  request: RequestType
+  request: RequestType,
+  metadata?: grpc.Metadata,
+  canceled?: boolean,
 ) => Observable<ResponseType>;
 
 export type ReactiveBidirectionalStreamMethod<RequestType, ResponseType> = (
-  request: Observable<RequestType>
+  request: Observable<RequestType>,
+  metadata?: grpc.Metadata,
+  canceled?: boolean,
 ) => Observable<ResponseType>;
 
 export type ReactiveMethod<RequestType, ResponseType> =

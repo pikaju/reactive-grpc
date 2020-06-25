@@ -3,7 +3,6 @@ import {map, reduce} from 'rxjs/operators';
 import { OneNumber, TwoNumbers, Empty } from './generated/service_pb';
 import { ExampleService, IExampleServer } from './generated/service_grpc_pb';
 import { defineMethod, defineService } from 'reactive-grpc';
-import * as grpc from 'grpc';
 
 class ExampleServer implements IExampleServer {
   addTwoNumbers = defineMethod(async function (request: TwoNumbers): Promise<OneNumber> {
