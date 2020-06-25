@@ -1,8 +1,10 @@
 import { interval, Observable } from "rxjs";
 import { map, reduce } from "rxjs/operators";
+
+import { defineMethod } from "reactive-grpc";
+
 import { OneNumber, TwoNumbers, Empty } from "./generated/service_pb";
 import { IExampleServer } from "./generated/service_grpc_pb";
-import { defineMethod } from "reactive-grpc";
 
 class ExampleServer implements IExampleServer {
   addTwoNumbers = defineMethod(async function (
