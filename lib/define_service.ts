@@ -4,6 +4,7 @@ import {
   ReactiveClientStreamMethod,
   ReactiveServerStreamMethod,
   ReactiveBidirectionalStreamMethod,
+  defineMethod,
 } from "./define_method";
 
 type ReactifyService<IService> = {
@@ -34,5 +35,18 @@ export function defineService<IServer>(
   serviceInfo: grpc.ServiceDefinition<grpc.UntypedServiceImplementation>,
   service: ReactifyService<IServer>
 ): IServer {
-  return {} as IServer;
+  type Placeholder = number;
+  const server: any = {};
+  for (const [key, value] of Object.entries(serviceInfo)) {
+    if (!value.requestStream && !value.responseStream) {
+      server[key] = defineMethod((service as any)[key] as ReactiveUnaryMethod<Placeholder, Placeholder>);
+    } else if (value.requestStream && !value.responseStream) {
+      server[key] = defineMethod((service as any)[key] as ReactiveClientStreamMethod<Placeholder, Placeholder>);
+    } else if (!value.requestStream && value.responseStream) {
+      server[key] = defineMethod((service as any)[key] as ReactiveServerStreamMethod<Placeholder, Placeholder>);
+    } else {
+      server[key] = defineMethod((service as any)[key] as ReactiveBidirectionalStreamMethod<Placeholder, Placeholder>);
+    }
+  }
+  return server as IServer;
 }
