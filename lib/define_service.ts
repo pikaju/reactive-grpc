@@ -1,42 +1,42 @@
 import * as grpc from "grpc";
 import {
-  ReactiveUnaryMethod,
-  ReactiveClientStreamMethod,
-  ReactiveServerStreamMethod,
-  ReactiveBidirectionalStreamMethod,
+  ReactiveServerUnaryMethod,
+  ReactiveServerRequestStreamMethod,
+  ReactiveServerResponseStreamMethod,
+  ReactiveServerBidirectionalStreamMethod,
   defineUnaryMethod,
-  defineClientStreamMethod,
-  defineServerStreamMethod,
+  defineRequestStreamMethod,
+  defineResponseStreamMethod,
   defineBidirectionalStreamMethod,
 } from "./define_method";
 
-type ReactifyService<IService> = {
+type ReactiveServer<IService> = {
   [rpc in keyof IService]: IService[rpc] extends grpc.handleUnaryCall<
     infer RequestType,
     infer ResponseType
   >
-    ? ReactiveUnaryMethod<RequestType, ResponseType>
+    ? ReactiveServerUnaryMethod<RequestType, ResponseType>
     : IService[rpc] extends grpc.handleClientStreamingCall<
         infer RequestType,
         infer ResponseType
       >
-    ? ReactiveClientStreamMethod<RequestType, ResponseType>
+    ? ReactiveServerRequestStreamMethod<RequestType, ResponseType>
     : IService[rpc] extends grpc.handleServerStreamingCall<
         infer RequestType,
         infer ResponseType
       >
-    ? ReactiveServerStreamMethod<RequestType, ResponseType>
+    ? ReactiveServerResponseStreamMethod<RequestType, ResponseType>
     : IService[rpc] extends grpc.handleBidiStreamingCall<
         infer RequestType,
         infer ResponseType
       >
-    ? ReactiveBidirectionalStreamMethod<RequestType, ResponseType>
+    ? ReactiveServerBidirectionalStreamMethod<RequestType, ResponseType>
     : never;
 };
 
 export function defineService<IServer>(
   serviceInfo: grpc.ServiceDefinition<grpc.UntypedServiceImplementation>,
-  service: ReactifyService<IServer>
+  service: ReactiveServer<IServer>
 ): IServer {
   type Placeholder = number;
   const server: any = {};
@@ -44,9 +44,9 @@ export function defineService<IServer>(
     if (!value.requestStream && !value.responseStream) {
       server[key] = defineUnaryMethod((service as any)[key]);
     } else if (value.requestStream && !value.responseStream) {
-      server[key] = defineClientStreamMethod((service as any)[key]);
+      server[key] = defineRequestStreamMethod((service as any)[key]);
     } else if (!value.requestStream && value.responseStream) {
-      server[key] = defineServerStreamMethod((service as any)[key]);
+      server[key] = defineResponseStreamMethod((service as any)[key]);
     } else {
       server[key] = defineBidirectionalStreamMethod((service as any)[key]);
     }

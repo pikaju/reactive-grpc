@@ -7,13 +7,13 @@ export type ReactiveClientUnaryMethod<RequestType, ResponseType> = (
   options?: Partial<grpc.CallOptions>
 ) => Promise<ResponseType>;
 
-export type ReactiveClientClientStreamMethod<RequestType, ResponseType> = (
+export type ReactiveClientRequestStreamMethod<RequestType, ResponseType> = (
   request: Observable<RequestType>,
   metadata?: grpc.Metadata,
   options?: Partial<grpc.CallOptions>
 ) => Promise<ResponseType>;
 
-export type ReactiveClientServerStreamMethod<RequestType, ResponseType> = (
+export type ReactiveClientResponseStreamMethod<RequestType, ResponseType> = (
   request: RequestType,
   metadata?: grpc.Metadata,
   options?: Partial<grpc.CallOptions>
@@ -30,6 +30,6 @@ export type ReactiveClientBidirectionalStreamMethod<
 
 export type ReactiveClientMethod<RequestType, ResponseType> =
   | ReactiveClientUnaryMethod<RequestType, ResponseType>
-  | ReactiveClientClientStreamMethod<RequestType, ResponseType>
-  | ReactiveClientServerStreamMethod<RequestType, ResponseType>
+  | ReactiveClientRequestStreamMethod<RequestType, ResponseType>
+  | ReactiveClientResponseStreamMethod<RequestType, ResponseType>
   | ReactiveClientBidirectionalStreamMethod<RequestType, ResponseType>;

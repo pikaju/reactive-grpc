@@ -1,35 +1,38 @@
 import * as grpc from "grpc";
 import { Observable } from "rxjs";
 
-export type ReactiveUnaryMethod<RequestType, ResponseType> = (
+export type ReactiveServerUnaryMethod<RequestType, ResponseType> = (
   request: RequestType,
   metadata?: grpc.Metadata,
   canceled?: boolean
 ) => Promise<ResponseType>;
 
-export type ReactiveClientStreamMethod<RequestType, ResponseType> = (
+export type ReactiveServerRequestStreamMethod<RequestType, ResponseType> = (
   request: Observable<RequestType>,
   metadata?: grpc.Metadata,
   canceled?: boolean
 ) => Promise<ResponseType>;
 
-export type ReactiveServerStreamMethod<RequestType, ResponseType> = (
+export type ReactiveServerResponseStreamMethod<RequestType, ResponseType> = (
   request: RequestType,
   metadata?: grpc.Metadata,
   canceled?: boolean
 ) => Observable<ResponseType>;
 
-export type ReactiveBidirectionalStreamMethod<RequestType, ResponseType> = (
+export type ReactiveServerBidirectionalStreamMethod<
+  RequestType,
+  ResponseType
+> = (
   request: Observable<RequestType>,
   metadata?: grpc.Metadata,
   canceled?: boolean
 ) => Observable<ResponseType>;
 
-export type ReactiveMethod<RequestType, ResponseType> =
-  | ReactiveUnaryMethod<RequestType, ResponseType>
-  | ReactiveClientStreamMethod<RequestType, ResponseType>
-  | ReactiveServerStreamMethod<RequestType, ResponseType>
-  | ReactiveBidirectionalStreamMethod<RequestType, ResponseType>;
+export type ReactiveServerMethod<RequestType, ResponseType> =
+  | ReactiveServerUnaryMethod<RequestType, ResponseType>
+  | ReactiveServerRequestStreamMethod<RequestType, ResponseType>
+  | ReactiveServerResponseStreamMethod<RequestType, ResponseType>
+  | ReactiveServerBidirectionalStreamMethod<RequestType, ResponseType>;
 
 function observableFromStream<T>(stream: NodeJS.ReadableStream) {
   return new Observable<T>((observable) => {
@@ -49,7 +52,7 @@ function observableFromStream<T>(stream: NodeJS.ReadableStream) {
 }
 
 export function defineUnaryMethod<RequestType, ResponseType>(
-  method: ReactiveUnaryMethod<RequestType, ResponseType>
+  method: ReactiveServerUnaryMethod<RequestType, ResponseType>
 ): grpc.handleUnaryCall<RequestType, ResponseType> {
   return (
     call: grpc.ServerUnaryCall<RequestType>,
@@ -63,8 +66,8 @@ export function defineUnaryMethod<RequestType, ResponseType>(
   };
 }
 
-export function defineClientStreamMethod<RequestType, ResponseType>(
-  method: ReactiveClientStreamMethod<RequestType, ResponseType>
+export function defineRequestStreamMethod<RequestType, ResponseType>(
+  method: ReactiveServerRequestStreamMethod<RequestType, ResponseType>
 ): grpc.handleClientStreamingCall<RequestType, ResponseType> {
   return (
     call: grpc.ServerReadableStream<RequestType>,
@@ -79,8 +82,8 @@ export function defineClientStreamMethod<RequestType, ResponseType>(
   };
 }
 
-export function defineServerStreamMethod<RequestType, ResponseType>(
-  method: ReactiveServerStreamMethod<RequestType, ResponseType>
+export function defineResponseStreamMethod<RequestType, ResponseType>(
+  method: ReactiveServerResponseStreamMethod<RequestType, ResponseType>
 ): grpc.handleServerStreamingCall<RequestType, ResponseType> {
   return (call: grpc.ServerWritableStream<RequestType>): void => {
     const result = method(call.request, call.metadata, call.cancelled);
@@ -93,7 +96,7 @@ export function defineServerStreamMethod<RequestType, ResponseType>(
 }
 
 export function defineBidirectionalStreamMethod<RequestType, ResponseType>(
-  method: ReactiveBidirectionalStreamMethod<RequestType, ResponseType>
+  method: ReactiveServerBidirectionalStreamMethod<RequestType, ResponseType>
 ): grpc.handleBidiStreamingCall<RequestType, ResponseType> {
   return (call: grpc.ServerDuplexStream<RequestType, ResponseType>): void => {
     const observable = observableFromStream<RequestType>(call);

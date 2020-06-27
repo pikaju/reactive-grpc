@@ -3,8 +3,8 @@ import { map, reduce } from "rxjs/operators";
 
 import {
   defineUnaryMethod,
-  defineClientStreamMethod,
-  defineServerStreamMethod,
+  defineRequestStreamMethod,
+  defineResponseStreamMethod,
   defineBidirectionalStreamMethod,
 } from "reactive-grpc";
 
@@ -17,7 +17,7 @@ export default class ExampleServer implements IExampleServer {
   ): Promise<OneNumber> {
     return new OneNumber().setA(request.getA() + request.getB());
   });
-  addStreamOfNumbers = defineClientStreamMethod(function (
+  addStreamOfNumbers = defineRequestStreamMethod(function (
     request: Observable<OneNumber>
   ): Promise<OneNumber> {
     return request
@@ -27,7 +27,7 @@ export default class ExampleServer implements IExampleServer {
       )
       .toPromise();
   });
-  getFibonacciSequence = defineServerStreamMethod(function (
+  getFibonacciSequence = defineResponseStreamMethod(function (
     request: Empty
   ): Observable<OneNumber> {
     let a = 0;

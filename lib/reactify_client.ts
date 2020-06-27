@@ -1,12 +1,12 @@
 import * as grpc from "grpc";
 import {
   ReactiveClientUnaryMethod,
-  ReactiveClientClientStreamMethod,
-  ReactiveClientServerStreamMethod,
+  ReactiveClientRequestStreamMethod,
+  ReactiveClientResponseStreamMethod,
   ReactiveClientBidirectionalStreamMethod,
 } from "./client_methods";
 
-type ReactifyClient<ClientType extends grpc.Client> = {
+type ReactiveClient<ClientType extends grpc.Client> = {
   [rpc in keyof ClientType]: ClientType[rpc] extends (
     metadata: grpc.Metadata,
     options: Partial<grpc.CallOptions>
@@ -17,7 +17,7 @@ type ReactifyClient<ClientType extends grpc.Client> = {
         metadata: grpc.Metadata,
         options: Partial<grpc.CallOptions>
       ) => grpc.ClientReadableStream<infer ResponseType>
-    ? ReactiveClientServerStreamMethod<RequestType, ResponseType>
+    ? ReactiveClientResponseStreamMethod<RequestType, ResponseType>
     : ClientType[rpc] extends (
         metadata: grpc.Metadata,
         options: Partial<grpc.CallOptions>,
@@ -26,7 +26,7 @@ type ReactifyClient<ClientType extends grpc.Client> = {
           response: infer ResponseType
         ) => void
       ) => grpc.ClientWritableStream<infer RequestType>
-    ? ReactiveClientClientStreamMethod<RequestType, ResponseType>
+    ? ReactiveClientRequestStreamMethod<RequestType, ResponseType>
     : ClientType[rpc] extends (
         request: infer RequestType,
         metadata: grpc.Metadata,
@@ -43,6 +43,6 @@ type ReactifyClient<ClientType extends grpc.Client> = {
 export function reactifyClient<ClientType extends grpc.Client>(
   serviceDefinition: grpc.ServiceDefinition<grpc.UntypedServiceImplementation>,
   client: ClientType
-): ReactifyClient<ClientType> {
-  return (null as unknown) as ReactifyClient<ClientType>;
+): ReactiveClient<ClientType> {
+  return (null as unknown) as ReactiveClient<ClientType>;
 }
