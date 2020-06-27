@@ -61,7 +61,7 @@ async function testServer(port: string) {
     );
     process.stdout.write("Result: ");
     await response
-      .pipe(map((value) => process.stdout.write(`${value} `)))
+      .pipe(map((value) => process.stdout.write(`${value.getA()} `)))
       .toPromise();
     console.log("");
   }

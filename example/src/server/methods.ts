@@ -19,6 +19,7 @@ export default class ExampleServer implements IExampleServer {
     result.setA(request.getA() + request.getB());
     return result;
   });
+
   addStreamOfNumbers = defineRequestStreamMethod(function (
     request: Observable<OneNumber>
   ): Promise<OneNumber> {
@@ -33,6 +34,7 @@ export default class ExampleServer implements IExampleServer {
       )
       .toPromise();
   });
+
   getFibonacciSequence = defineResponseStreamMethod(function (
     request: Empty
   ): Observable<OneNumber> {
@@ -49,6 +51,7 @@ export default class ExampleServer implements IExampleServer {
       })
     );
   });
+
   runningAverage = defineBidirectionalStreamMethod(function (
     request: Observable<OneNumber>
   ): Observable<OneNumber> {
