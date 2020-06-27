@@ -1,18 +1,23 @@
 import { interval, Observable } from "rxjs";
 import { map, reduce } from "rxjs/operators";
 
-import { defineMethod } from "reactive-grpc";
+import {
+  defineUnaryMethod,
+  defineClientStreamMethod,
+  defineServerStreamMethod,
+  defineBidirectionalStreamMethod,
+} from "reactive-grpc";
 
 import { OneNumber, TwoNumbers, Empty } from "../generated/service_pb";
 import { IExampleServer } from "../generated/service_grpc_pb";
 
 export default class ExampleServer implements IExampleServer {
-  addTwoNumbers = defineMethod(async function (
+  addTwoNumbers = defineUnaryMethod(async function (
     request: TwoNumbers
   ): Promise<OneNumber> {
     return new OneNumber().setA(request.getA() + request.getB());
   });
-  addStreamOfNumbers = defineMethod(function (
+  addStreamOfNumbers = defineClientStreamMethod(function (
     request: Observable<OneNumber>
   ): Promise<OneNumber> {
     return request
@@ -22,7 +27,7 @@ export default class ExampleServer implements IExampleServer {
       )
       .toPromise();
   });
-  getFibonacciSequence = defineMethod(function (
+  getFibonacciSequence = defineServerStreamMethod(function (
     request: Empty
   ): Observable<OneNumber> {
     let a = 0;
@@ -36,7 +41,7 @@ export default class ExampleServer implements IExampleServer {
       })
     );
   });
-  runningAverage = defineMethod(function (
+  runningAverage = defineBidirectionalStreamMethod(function (
     request: Observable<OneNumber>
   ): Observable<OneNumber> {
     let average = 0;

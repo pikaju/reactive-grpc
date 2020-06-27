@@ -40,4 +40,3 @@ export default defineService<IExampleServer>(ExampleService, {
     );
   },
 });
-

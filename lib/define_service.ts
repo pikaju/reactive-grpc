@@ -4,7 +4,10 @@ import {
   ReactiveClientStreamMethod,
   ReactiveServerStreamMethod,
   ReactiveBidirectionalStreamMethod,
-  defineMethod,
+  defineUnaryMethod,
+  defineClientStreamMethod,
+  defineServerStreamMethod,
+  defineBidirectionalStreamMethod,
 } from "./define_method";
 
 type ReactifyService<IService> = {
@@ -39,13 +42,13 @@ export function defineService<IServer>(
   const server: any = {};
   for (const [key, value] of Object.entries(serviceInfo)) {
     if (!value.requestStream && !value.responseStream) {
-      server[key] = defineMethod((service as any)[key] as ReactiveUnaryMethod<Placeholder, Placeholder>);
+      server[key] = defineUnaryMethod((service as any)[key]);
     } else if (value.requestStream && !value.responseStream) {
-      server[key] = defineMethod((service as any)[key] as ReactiveClientStreamMethod<Placeholder, Placeholder>);
+      server[key] = defineClientStreamMethod((service as any)[key]);
     } else if (!value.requestStream && value.responseStream) {
-      server[key] = defineMethod((service as any)[key] as ReactiveServerStreamMethod<Placeholder, Placeholder>);
+      server[key] = defineServerStreamMethod((service as any)[key]);
     } else {
-      server[key] = defineMethod((service as any)[key] as ReactiveBidirectionalStreamMethod<Placeholder, Placeholder>);
+      server[key] = defineBidirectionalStreamMethod((service as any)[key]);
     }
   }
   return server as IServer;
