@@ -1,28 +1,11 @@
 import * as grpc from "grpc";
-import { Observable } from "rxjs";
 import {
   ReactiveServerUnaryMethod,
   ReactiveServerRequestStreamMethod,
   ReactiveServerResponseStreamMethod,
   ReactiveServerBidirectionalStreamMethod,
 } from "./server_methods";
-
-function observableFromStream<T>(stream: NodeJS.ReadableStream) {
-  return new Observable<T>((observable) => {
-    function errorHandler(error: any) {
-      observable.error(error);
-      observable.complete();
-    }
-    stream.on("data", observable.next);
-    stream.on("error", errorHandler);
-    stream.on("end", observable.complete);
-    return () => {
-      stream.removeListener("data", observable.next);
-      stream.removeListener("error", errorHandler);
-      stream.removeListener("end", observable.complete);
-    };
-  });
-}
+import { observableFromStream } from "./observable_from_stream";
 
 export function defineUnaryMethod<RequestType, ResponseType>(
   method: ReactiveServerUnaryMethod<RequestType, ResponseType>

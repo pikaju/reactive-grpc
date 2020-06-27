@@ -1,10 +1,12 @@
 import * as grpc from "grpc";
+import { Observable } from "rxjs";
 import {
   ReactiveClientUnaryMethod,
   ReactiveClientRequestStreamMethod,
   ReactiveClientResponseStreamMethod,
   ReactiveClientBidirectionalStreamMethod,
 } from "./client_methods";
+import { observableFromStream } from "./observable_from_stream";
 
 type ReactiveClient<ClientType extends grpc.Client> = {
   [rpc in keyof ClientType]: ClientType[rpc] extends (
@@ -40,9 +42,107 @@ type ReactiveClient<ClientType extends grpc.Client> = {
     : ClientType[rpc];
 };
 
+function reactifyUnaryMethod<RequestType, ResponseType>(
+  method: any
+): ReactiveClientUnaryMethod<RequestType, ResponseType> {
+  return (
+    request: RequestType,
+    metadata?: grpc.Metadata,
+    options?: Partial<grpc.CallOptions>
+  ) => {
+    return new Promise((resolve, reject) => {
+      const callback = (error: any, response: any) =>
+        error ? reject(error) : resolve(response);
+      let call: grpc.ClientUnaryCall;
+      if (metadata) {
+        if (options) call = method(request, metadata, options, callback);
+        else call = method(request, metadata, callback);
+      } else call = method(request, callback);
+    });
+  };
+}
+
+function reactifyRequestStreamMethod<RequestType, ResponseType>(
+  method: any
+): ReactiveClientRequestStreamMethod<RequestType, ResponseType> {
+  return (
+    request: Observable<RequestType>,
+    metadata?: grpc.Metadata,
+    options?: Partial<grpc.CallOptions>
+  ) => {
+    return new Promise((resolve, reject) => {
+      const callback = (error: any, response: any) =>
+        error ? reject(error) : resolve(response);
+      let call: grpc.ClientWritableStream<RequestType>;
+      if (metadata) {
+        if (options) call = method(metadata, options, callback);
+        else call = method(metadata, callback);
+      } else call = method(callback);
+      request.subscribe(
+        (value) => call.write(value),
+        (error) => call.destroy(error),
+        () => call.end()
+      );
+    });
+  };
+}
+
+function reactifyResponseStreamMethod<RequestType, ResponseType>(
+  method: any
+): ReactiveClientResponseStreamMethod<RequestType, ResponseType> {
+  return (
+    request: RequestType,
+    metadata?: grpc.Metadata,
+    options?: Partial<grpc.CallOptions>
+  ) => {
+    let call: grpc.ClientReadableStream<ResponseType>;
+    if (metadata) {
+      if (options) call = method(request, metadata, options);
+      else call = method(request, metadata);
+    } else call = method(request);
+    return observableFromStream(call);
+  };
+}
+
+function reactifyBidirectionalStreamMethod<RequestType, ResponseType>(
+  method: any
+): ReactiveClientBidirectionalStreamMethod<RequestType, ResponseType> {
+  return (
+    request: Observable<RequestType>,
+    metadata?: grpc.Metadata,
+    options?: Partial<grpc.CallOptions>
+  ) => {
+    let call: grpc.ClientDuplexStream<RequestType, ResponseType>;
+    if (metadata) {
+      if (options) call = method(metadata, options);
+      else call = method(metadata);
+    } else call = method();
+    request.subscribe(
+      (value) => call.write(value),
+      (error) => call.destroy(error),
+      () => call.end()
+    );
+    return observableFromStream(call);
+  };
+}
+
 export function reactifyClient<ClientType extends grpc.Client>(
   serviceDefinition: grpc.ServiceDefinition<grpc.UntypedServiceImplementation>,
   client: ClientType
 ): ReactiveClient<ClientType> {
-  return (null as unknown) as ReactiveClient<ClientType>;
+  const reactiveClient: any = {};
+  for (const [key, value] of Object.entries(serviceDefinition)) {
+    if (!value.requestStream && !value.responseStream) {
+      reactiveClient[key] = reactifyUnaryMethod((client as any)[key]);
+    } else if (value.requestStream && !value.responseStream) {
+      reactiveClient[key] = reactifyRequestStreamMethod((client as any)[key]);
+    } else if (!value.requestStream && value.responseStream) {
+      reactiveClient[key] = reactifyResponseStreamMethod((client as any)[key]);
+    } else {
+      reactiveClient[key] = reactifyBidirectionalStreamMethod(
+        (client as any)[key]
+      );
+    }
+  }
+  return reactiveClient as ReactiveClient<ClientType>;
 }
