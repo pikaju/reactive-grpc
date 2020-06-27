@@ -8,7 +8,7 @@ import { ExampleClient, ExampleService } from "../generated/service_grpc_pb";
 import { reactifyClient } from "reactive-grpc";
 
 async function testServer(port: string) {
-  console.log(`Testing server "${port}:"`);
+  console.log(`Testing server "${port}":`);
   const client = new ExampleClient(port, grpc.credentials.createInsecure());
   const reactiveClient = reactifyClient(ExampleService, client);
 
