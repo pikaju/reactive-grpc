@@ -38,13 +38,13 @@ export default class ExampleServer implements IExampleServer {
   ): Observable<OneNumber> {
     let a = 0;
     let b = 1;
-    return interval(1000).pipe(
+    return interval(100).pipe(
       map(() => {
         let next = a + b;
         a = b;
         b = next;
         const result = new OneNumber();
-        result.setA(next);
+        result.setA(a);
         return result;
       })
     );
