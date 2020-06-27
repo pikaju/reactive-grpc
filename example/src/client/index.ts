@@ -13,7 +13,7 @@ const reactiveClient = reactifyClient(ExampleService, client);
 
 async function addTwoNumbersTest(a: number, b: number) {
   console.log(`Testing addTwoNumbers with a=${a} and b=${b}...`);
-  let request = new TwoNumbers();
+  const request = new TwoNumbers();
   request.setA(a);
   request.setB(b);
   const response = await reactiveClient.addTwoNumbers(request);

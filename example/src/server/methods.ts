@@ -15,7 +15,9 @@ export default class ExampleServer implements IExampleServer {
   addTwoNumbers = defineUnaryMethod(async function (
     request: TwoNumbers
   ): Promise<OneNumber> {
-    return new OneNumber().setA(request.getA() + request.getB());
+    const result = new OneNumber();
+    result.setA(request.getA() + request.getB());
+    return result;
   });
   addStreamOfNumbers = defineRequestStreamMethod(function (
     request: Observable<OneNumber>
@@ -23,7 +25,11 @@ export default class ExampleServer implements IExampleServer {
     return request
       .pipe(
         reduce((acc, value) => acc + value.getA(), 0),
-        map((value) => new OneNumber().setA(value))
+        map((value) => {
+          const result = new OneNumber();
+          result.setA(value);
+          return result;
+        })
       )
       .toPromise();
   });
@@ -37,7 +43,9 @@ export default class ExampleServer implements IExampleServer {
         let next = a + b;
         a = b;
         b = next;
-        return new OneNumber().setA(next);
+        const result = new OneNumber();
+        result.setA(next);
+        return result;
       })
     );
   });
@@ -48,7 +56,9 @@ export default class ExampleServer implements IExampleServer {
     return request.pipe(
       map((value, index) => {
         average = (value.getA() + index * average) / (index + 1);
-        return new OneNumber().setA(average);
+        const result = new OneNumber();
+        result.setA(average);
+        return result;
       })
     );
   });
