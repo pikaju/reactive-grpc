@@ -43,11 +43,12 @@ export function defineResponseStreamMethod<RequestType, ResponseType>(
 ): grpc.handleServerStreamingCall<RequestType, ResponseType> {
   return (call: grpc.ServerWritableStream<RequestType>): void => {
     const result = method(call.request, call.metadata, call.cancelled);
-    result.subscribe(
+    const subscription = result.subscribe(
       (value) => call.write(value),
       (error) => call.destroy(error),
       () => call.end()
     );
+    call.on("cancelled", () => subscription.unsubscribe());
   };
 }
 
@@ -57,10 +58,11 @@ export function defineBidirectionalStreamMethod<RequestType, ResponseType>(
   return (call: grpc.ServerDuplexStream<RequestType, ResponseType>): void => {
     const observable = observableFromServerStream<RequestType>(call);
     const result = method(observable, call.metadata, call.cancelled);
-    result.subscribe(
+    const subscription = result.subscribe(
       (value) => call.write(value),
       (error) => call.destroy(error),
       () => call.end()
     );
+    call.on("cancelled", () => subscription.unsubscribe());
   };
 }
