@@ -13,10 +13,8 @@
   "types": "build/index.d.ts",
   "scripts": {
     "format": "prettier --write \"lib/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json",
-    "build": "yarn run tsc",
-    "prepare": "yarn run build",
-    "prepublishOnly": "yarn run lint"
+    "build": "tsc",
+    "prepare": "yarn run build"
   },
   "dependencies": {
     "grpc": "^1.24.3",
@@ -24,8 +22,6 @@
   },
   "devDependencies": {
     "prettier": "^2.0.5",
-    "tslint": "^6.1.2",
-    "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.9.5"
   }
 }
