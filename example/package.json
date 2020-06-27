@@ -12,7 +12,7 @@
   "scripts": {
     "generate": "bash generate.sh",
     "format": "prettier --write \"src/**/*.ts\"",
-    "serve": "ts-node src/server/"
+    "serve": "yarn generate && ts-node src/server/"
   },
   "dependencies": {
     "reactive-grpc": "file:../"
