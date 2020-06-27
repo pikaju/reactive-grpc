@@ -5,21 +5,25 @@ import { ExampleClient, ExampleService } from "../generated/service_grpc_pb";
 
 import { reactifyClient } from "reactive-grpc";
 
-const client = new ExampleClient(
-  "localhost:5001",
-  grpc.credentials.createInsecure()
-);
-const reactiveClient = reactifyClient(ExampleService, client);
+async function testServer(port: string) {
+  console.log(`Testing server "${port}:"`);
+  const client = new ExampleClient(port, grpc.credentials.createInsecure());
+  const reactiveClient = reactifyClient(ExampleService, client);
 
-async function addTwoNumbersTest(a: number, b: number) {
-  console.log(`Testing addTwoNumbers with a=${a} and b=${b}...`);
-  const request = new TwoNumbers();
-  request.setA(a);
-  request.setB(b);
-  const response = await reactiveClient.addTwoNumbers(request);
-  console.log(`Result: ${response.getA()}`);
+  async function addTwoNumbersTest(a: number, b: number) {
+    console.log(`Testing addTwoNumbers with a=${a} and b=${b}...`);
+    const request = new TwoNumbers();
+    request.setA(a);
+    request.setB(b);
+    const response = await reactiveClient.addTwoNumbers(request);
+    console.log(`Result: ${response.getA()}`);
+  }
+
+  await addTwoNumbersTest(3, 5);
+  console.log("");
 }
 
 (async () => {
-  await addTwoNumbersTest(3, 5);
+  await testServer("localhost:5001");
+  await testServer("localhost:5002");
 })();
