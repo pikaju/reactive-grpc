@@ -40,7 +40,6 @@ export function defineService<IServer>(
   serviceInfo: grpc.ServiceDefinition<grpc.UntypedServiceImplementation>,
   service: ReactiveServer<IServer>
 ): IServer {
-  type Placeholder = number;
   const server: any = {};
   for (const [key, value] of Object.entries(serviceInfo)) {
     if (!value.requestStream && !value.responseStream) {
