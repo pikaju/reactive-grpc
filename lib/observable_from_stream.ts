@@ -23,6 +23,9 @@ export function observableFromClientStream<T>(
     stream.on("end", endHandler);
 
     return () => {
+      stream.removeListener("data", dataHandler);
+      stream.removeListener("error", errorHandler);
+      stream.removeListener("end", endHandler);
       // Tollerate cancelling by listening for errors and ignoring them.
       stream.on("error", () => {});
       stream.cancel();
