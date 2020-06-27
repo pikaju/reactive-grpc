@@ -1,5 +1,5 @@
 import * as grpc from "grpc";
-import { Observable, observable } from "rxjs";
+import { Observable } from "rxjs";
 
 export type ReactiveUnaryMethod<RequestType, ResponseType> = (
   request: RequestType,
