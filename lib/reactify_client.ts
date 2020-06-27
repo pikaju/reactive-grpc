@@ -13,33 +13,33 @@ type ReactiveClient<ClientType extends grpc.Client> = {
     metadata: grpc.Metadata,
     options: Partial<grpc.CallOptions>
   ) => grpc.ClientDuplexStream<infer RequestType, infer ResponseType>
-  ? ReactiveClientBidirectionalStreamMethod<RequestType, ResponseType>
-  : ClientType[rpc] extends (
-    request: infer RequestType,
-    metadata: grpc.Metadata,
-    options: Partial<grpc.CallOptions>
-  ) => grpc.ClientReadableStream<infer ResponseType>
-  ? ReactiveClientResponseStreamMethod<RequestType, ResponseType>
-  : ClientType[rpc] extends (
-    metadata: grpc.Metadata,
-    options: Partial<grpc.CallOptions>,
-    callback: (
-      error: grpc.ServiceError | null,
-      response: infer ResponseType
-    ) => void
-  ) => grpc.ClientWritableStream<infer RequestType>
-  ? ReactiveClientRequestStreamMethod<RequestType, ResponseType>
-  : ClientType[rpc] extends (
-    request: infer RequestType,
-    metadata: grpc.Metadata,
-    options: Partial<grpc.CallOptions>,
-    callback: (
-      error: grpc.ServiceError | null,
-      response: infer ResponseType
-    ) => void
-  ) => grpc.ClientUnaryCall
-  ? ReactiveClientUnaryMethod<RequestType, ResponseType>
-  : ClientType[rpc];
+    ? ReactiveClientBidirectionalStreamMethod<RequestType, ResponseType>
+    : ClientType[rpc] extends (
+        request: infer RequestType,
+        metadata: grpc.Metadata,
+        options: Partial<grpc.CallOptions>
+      ) => grpc.ClientReadableStream<infer ResponseType>
+    ? ReactiveClientResponseStreamMethod<RequestType, ResponseType>
+    : ClientType[rpc] extends (
+        metadata: grpc.Metadata,
+        options: Partial<grpc.CallOptions>,
+        callback: (
+          error: grpc.ServiceError | null,
+          response: infer ResponseType
+        ) => void
+      ) => grpc.ClientWritableStream<infer RequestType>
+    ? ReactiveClientRequestStreamMethod<RequestType, ResponseType>
+    : ClientType[rpc] extends (
+        request: infer RequestType,
+        metadata: grpc.Metadata,
+        options: Partial<grpc.CallOptions>,
+        callback: (
+          error: grpc.ServiceError | null,
+          response: infer ResponseType
+        ) => void
+      ) => grpc.ClientUnaryCall
+    ? ReactiveClientUnaryMethod<RequestType, ResponseType>
+    : never;
 };
 
 function reactifyUnaryMethod<RequestType, ResponseType>(
@@ -130,17 +130,23 @@ export function reactifyClient<ClientType extends grpc.Client>(
   serviceDefinition: grpc.ServiceDefinition<grpc.UntypedServiceImplementation>,
   client: ClientType
 ): ReactiveClient<ClientType> {
-  const reactiveClient: any = Object.assign({}, client);
+  const reactiveClient: any = {};
   for (const [key, value] of Object.entries(serviceDefinition)) {
     if (!value.requestStream && !value.responseStream) {
-      reactiveClient[key] = reactifyUnaryMethod(reactiveClient[key]);
+      reactiveClient[key] = reactifyUnaryMethod(
+        (client as any)[key].bind(client)
+      );
     } else if (value.requestStream && !value.responseStream) {
-      reactiveClient[key] = reactifyRequestStreamMethod(reactiveClient[key]);
+      reactiveClient[key] = reactifyRequestStreamMethod(
+        (client as any)[key].bind(client)
+      );
     } else if (!value.requestStream && value.responseStream) {
-      reactiveClient[key] = reactifyResponseStreamMethod(reactiveClient[key]);
+      reactiveClient[key] = reactifyResponseStreamMethod(
+        (client as any)[key].bind(client)
+      );
     } else {
       reactiveClient[key] = reactifyBidirectionalStreamMethod(
-        reactiveClient[key]
+        (client as any)[key].bind(client)
       );
     }
   }
