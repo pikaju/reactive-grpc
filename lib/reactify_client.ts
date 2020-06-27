@@ -53,11 +53,12 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
     return new Promise((resolve, reject) => {
       const callback = (error: any, response: any) =>
         error ? reject(error) : resolve(response);
-      let call: grpc.ClientUnaryCall;
-      if (metadata) {
-        if (options) call = method(request, metadata, options, callback);
-        else call = method(request, metadata, callback);
-      } else call = method(request, callback);
+      let call: grpc.ClientUnaryCall = method(
+        request,
+        metadata,
+        options,
+        callback
+      );
     });
   };
 }
@@ -73,11 +74,11 @@ function reactifyRequestStreamMethod<RequestType, ResponseType>(
     return new Promise((resolve, reject) => {
       const callback = (error: any, response: any) =>
         error ? reject(error) : resolve(response);
-      let call: grpc.ClientWritableStream<RequestType>;
-      if (metadata) {
-        if (options) call = method(metadata, options, callback);
-        else call = method(metadata, callback);
-      } else call = method(callback);
+      const call: grpc.ClientWritableStream<RequestType> = method(
+        metadata,
+        options,
+        callback
+      );
       request.subscribe(
         (value) => call.write(value),
         (error) => call.destroy(error),
@@ -95,11 +96,11 @@ function reactifyResponseStreamMethod<RequestType, ResponseType>(
     metadata?: grpc.Metadata,
     options?: Partial<grpc.CallOptions>
   ) => {
-    let call: grpc.ClientReadableStream<ResponseType>;
-    if (metadata) {
-      if (options) call = method(request, metadata, options);
-      else call = method(request, metadata);
-    } else call = method(request);
+    let call: grpc.ClientReadableStream<ResponseType> = method(
+      request,
+      metadata,
+      options
+    );
     return observableFromClientStream(call);
   };
 }
@@ -112,11 +113,10 @@ function reactifyBidirectionalStreamMethod<RequestType, ResponseType>(
     metadata?: grpc.Metadata,
     options?: Partial<grpc.CallOptions>
   ) => {
-    let call: grpc.ClientDuplexStream<RequestType, ResponseType>;
-    if (metadata) {
-      if (options) call = method(metadata, options);
-      else call = method(metadata);
-    } else call = method();
+    let call: grpc.ClientDuplexStream<RequestType, ResponseType> = method(
+      metadata,
+      options
+    );
     request.subscribe(
       (value) => call.write(value),
       (error) => call.destroy(error),
