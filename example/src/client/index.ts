@@ -1,6 +1,7 @@
 import * as grpc from "grpc";
+import { from } from "rxjs";
 
-import { TwoNumbers } from "../generated/service_pb";
+import { TwoNumbers, OneNumber } from "../generated/service_pb";
 import { ExampleClient, ExampleService } from "../generated/service_grpc_pb";
 
 import { reactifyClient } from "reactive-grpc";
@@ -19,7 +20,22 @@ async function testServer(port: string) {
     console.log(`Result: ${response.getA()}`);
   }
 
+  async function addStreamOfNumbersTest(numbers: Array<number>) {
+    console.log(`Testing addSteamOfNumbers with ${numbers}...`);
+    const response = await reactiveClient.addStreamOfNumbers(
+      from(
+        numbers.map((value: number) => {
+          const oneNumber = new OneNumber();
+          oneNumber.setA(value);
+          return oneNumber;
+        })
+      )
+    );
+    console.log(`Result: ${response.getA()}`);
+  }
+
   await addTwoNumbersTest(3, 5);
+  await addStreamOfNumbersTest([1, 2, 3, 4]);
   console.log("");
 }
 
