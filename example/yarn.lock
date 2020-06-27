@@ -15,6 +15,11 @@
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
   integrity sha512-rr+OQyAjxze7GgWrSaJwydHStIhHq2lvY3BOC2Mj7KnzI7XK0Uw1TOOdI9lDoajEbSWLiYgoo4f1R51erQfhPQ==
 
+"@types/google-protobuf@^3.7.2":
+  version "3.7.2"
+  resolved "https://registry.yarnpkg.com/@types/google-protobuf/-/google-protobuf-3.7.2.tgz#cd8a360c193ce4d672575a20a79f49ba036d38d2"
+  integrity sha512-ifFemzjNchFBCtHS6bZNhSZCBu7tbtOe0e8qY0z2J4HtFXmPJjm6fXSaQsTG7yhShBEZtt2oP/bkwu5k+emlkQ==
+
 "@types/long@*":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@types/long/-/long-4.0.1.tgz#459c65fa1867dafe6a8f322c4c51695663cc55e9"
@@ -814,10 +819,10 @@ grpc@^1.24.3:
     node-pre-gyp "^0.15.0"
     protobufjs "^5.0.3"
 
-grpc_tools_node_protoc_ts@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/grpc_tools_node_protoc_ts/-/grpc_tools_node_protoc_ts-4.0.0.tgz#5e07e1e474f31901e17bc41f5c1e958cb1c7d170"
-  integrity sha512-qmWOsszz3Mmx1/aO6TLAoz8ZPFpWqj+1uyW/RaRio/j9ZxmSKMZA2hjiNxuyKHclTNkSWtWFrLKNr3b2HLb2CA==
+grpc_tools_node_protoc_ts@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/grpc_tools_node_protoc_ts/-/grpc_tools_node_protoc_ts-4.1.0.tgz#3a5ff0022f7e0ab3a708309f1ff7e61c5c5a63af"
+  integrity sha512-+10Q2LhTalc41e+hCfP7lCLYfyDlAdntEKTn43QHE3CPafNHRu5KgqAHkDg4cUiDEJFUcKhddaYUPI5uR7c2AA==
   dependencies:
     google-protobuf "3.5.0"
     handlebars "4.7.4"
