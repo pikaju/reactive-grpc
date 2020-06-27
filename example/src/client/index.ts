@@ -1,8 +1,8 @@
 import * as grpc from "grpc";
 import { from } from "rxjs";
-import { map } from "rxjs/operators";
+import { map, take, catchError } from "rxjs/operators";
 
-import { TwoNumbers, OneNumber } from "../generated/service_pb";
+import { TwoNumbers, OneNumber, Empty } from "../generated/service_pb";
 import { ExampleClient, ExampleService } from "../generated/service_grpc_pb";
 
 import { reactifyClient } from "reactive-grpc";
@@ -35,8 +35,22 @@ async function testServer(port: string) {
     console.log(`Result: ${response.getA()}`);
   }
 
+  async function getFibonacciSequenceTest(count: number) {
+    console.log(`Testing getFibonacciSequence with ${count} numbers...`);
+    const response = reactiveClient.getFibonacciSequence(new Empty());
+    process.stdout.write("Result: ");
+    await response
+      .pipe(
+        take(count),
+        map((value) => process.stdout.write(`${value} `))
+      )
+      .toPromise();
+    console.log("");
+  }
+
   await addTwoNumbersTest(3, 5);
   await addStreamOfNumbersTest([1, 2, 3, 4]);
+  await getFibonacciSequenceTest(5);
   console.log("");
 }
 

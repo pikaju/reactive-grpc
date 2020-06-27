@@ -6,7 +6,7 @@ import {
   ReactiveClientResponseStreamMethod,
   ReactiveClientBidirectionalStreamMethod,
 } from "./client_methods";
-import { observableFromStream } from "./observable_from_stream";
+import { observableFromClientStream } from "./observable_from_stream";
 
 type ReactiveClient<ClientType extends grpc.Client> = {
   [rpc in keyof ClientType]: ClientType[rpc] extends (
@@ -100,7 +100,7 @@ function reactifyResponseStreamMethod<RequestType, ResponseType>(
       if (options) call = method(request, metadata, options);
       else call = method(request, metadata);
     } else call = method(request);
-    return observableFromStream(call);
+    return observableFromClientStream(call);
   };
 }
 
@@ -122,7 +122,7 @@ function reactifyBidirectionalStreamMethod<RequestType, ResponseType>(
       (error) => call.destroy(error),
       () => call.end()
     );
-    return observableFromStream(call);
+    return observableFromClientStream(call);
   };
 }
 
