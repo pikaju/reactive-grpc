@@ -1,18 +1,18 @@
 import { Observable } from "rxjs";
 
 export function observableFromStream<T>(stream: NodeJS.ReadableStream) {
-  return new Observable<T>((observable) => {
+  return new Observable<T>((subscriber) => {
     function errorHandler(error: any) {
-      observable.error(error);
-      observable.complete();
+      subscriber.error(error);
+      subscriber.complete();
     }
-    stream.on("data", observable.next);
+    stream.on("data", subscriber.next);
     stream.on("error", errorHandler);
-    stream.on("end", observable.complete);
+    stream.on("end", subscriber.complete);
     return () => {
-      stream.removeListener("data", observable.next);
+      stream.removeListener("data", subscriber.next);
       stream.removeListener("error", errorHandler);
-      stream.removeListener("end", observable.complete);
+      stream.removeListener("end", subscriber.complete);
     };
   });
 }
