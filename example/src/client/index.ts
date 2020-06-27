@@ -48,9 +48,28 @@ async function testServer(port: string) {
     console.log("");
   }
 
+  async function runningAverageTest(numbers: Array<number>) {
+    console.log(`Testing runningAverage with ${numbers}...`);
+    const response = await reactiveClient.runningAverage(
+      from(numbers).pipe(
+        map((value: number) => {
+          const oneNumber = new OneNumber();
+          oneNumber.setA(value);
+          return oneNumber;
+        })
+      )
+    );
+    process.stdout.write("Result: ");
+    await response
+      .pipe(map((value) => process.stdout.write(`${value} `)))
+      .toPromise();
+    console.log("");
+  }
+
   await addTwoNumbersTest(3, 5);
   await addStreamOfNumbersTest([1, 2, 3, 4]);
   await getFibonacciSequenceTest(5);
+  await runningAverageTest([0, 10, 20, 50]);
   console.log("");
 }
 
