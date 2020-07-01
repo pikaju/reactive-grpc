@@ -1,6 +1,6 @@
 import * as grpc from "grpc";
 import { from } from "rxjs";
-import { map, take, catchError } from "rxjs/operators";
+import { map, take } from "rxjs/operators";
 
 import { TwoNumbers, OneNumber, Empty } from "../generated/service_pb";
 import { ExampleClient, ExampleService } from "../generated/service_grpc_pb";
