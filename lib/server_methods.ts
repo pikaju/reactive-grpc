@@ -1,15 +1,21 @@
 import * as grpc from "grpc";
 import { Observable } from "rxjs";
 
+export interface ReactiveServerUnaryResponse<ResponseType> {
+  value: ResponseType;
+  trailer?: grpc.Metadata;
+  flags?: number;
+}
+
 export type ReactiveServerUnaryMethod<RequestType, ResponseType> = (
   request: RequestType,
   call?: grpc.ServerUnaryCall<RequestType>
-) => Promise<ResponseType>;
+) => Promise<ResponseType | ReactiveServerUnaryResponse<ResponseType>>;
 
 export type ReactiveServerRequestStreamMethod<RequestType, ResponseType> = (
   request: Observable<RequestType>,
   call?: grpc.ServerReadableStream<RequestType>
-) => Promise<ResponseType>;
+) => Promise<ResponseType | ReactiveServerUnaryResponse<ResponseType>>;
 
 export type ReactiveServerResponseStreamMethod<RequestType, ResponseType> = (
   request: RequestType,

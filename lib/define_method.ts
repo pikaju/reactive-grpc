@@ -1,5 +1,6 @@
 import * as grpc from "grpc";
 import {
+  ReactiveServerUnaryResponse,
   ReactiveServerUnaryMethod,
   ReactiveServerRequestStreamMethod,
   ReactiveServerResponseStreamMethod,
@@ -16,7 +17,13 @@ export function defineUnaryMethod<RequestType, ResponseType>(
   ): void => {
     const result = method(call.request, call);
     result.then(
-      (value) => callback(null, value),
+      (response) => {
+        const unaryResponse = response as ReactiveServerUnaryResponse<ResponseType>;
+        if (unaryResponse.value)
+          callback(null, unaryResponse.value, unaryResponse.trailer, unaryResponse.flags);
+        else
+          callback(null, response as ResponseType);
+      },
       (reason) => callback(reason, null)
     );
   };
@@ -32,7 +39,13 @@ export function defineRequestStreamMethod<RequestType, ResponseType>(
     const observable = observableFromServerStream<RequestType>(call);
     const result = method(observable, call);
     result.then(
-      (value) => callback(null, value),
+      (response) => {
+        const unaryResponse = response as ReactiveServerUnaryResponse<ResponseType>;
+        if (unaryResponse.value)
+          callback(null, unaryResponse.value, unaryResponse.trailer, unaryResponse.flags);
+        else
+          callback(null, response as ResponseType);
+      },
       (reason) => callback(reason, null)
     );
   };
