@@ -14,7 +14,7 @@ export function defineUnaryMethod<RequestType, ResponseType>(
     call: grpc.ServerUnaryCall<RequestType>,
     callback: grpc.sendUnaryData<ResponseType>
   ): void => {
-    const result = method(call.request, call.metadata, call.cancelled);
+    const result = method(call.request, call);
     result.then(
       (value) => callback(null, value),
       (reason) => callback(reason, null)
@@ -30,7 +30,7 @@ export function defineRequestStreamMethod<RequestType, ResponseType>(
     callback: grpc.sendUnaryData<ResponseType>
   ): void => {
     const observable = observableFromServerStream<RequestType>(call);
-    const result = method(observable, call.metadata, call.cancelled);
+    const result = method(observable, call);
     result.then(
       (value) => callback(null, value),
       (reason) => callback(reason, null)
@@ -42,7 +42,7 @@ export function defineResponseStreamMethod<RequestType, ResponseType>(
   method: ReactiveServerResponseStreamMethod<RequestType, ResponseType>
 ): grpc.handleServerStreamingCall<RequestType, ResponseType> {
   return (call: grpc.ServerWritableStream<RequestType>): void => {
-    const result = method(call.request, call.metadata, call.cancelled);
+    const result = method(call.request, call);
     const subscription = result.subscribe(
       (value) => call.write(value),
       (error) => call.destroy(error),
@@ -57,7 +57,7 @@ export function defineBidirectionalStreamMethod<RequestType, ResponseType>(
 ): grpc.handleBidiStreamingCall<RequestType, ResponseType> {
   return (call: grpc.ServerDuplexStream<RequestType, ResponseType>): void => {
     const observable = observableFromServerStream<RequestType>(call);
-    const result = method(observable, call.metadata, call.cancelled);
+    const result = method(observable, call);
     const subscription = result.subscribe(
       (value) => call.write(value),
       (error) => call.destroy(error),

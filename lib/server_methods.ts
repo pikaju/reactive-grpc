@@ -3,20 +3,17 @@ import { Observable } from "rxjs";
 
 export type ReactiveServerUnaryMethod<RequestType, ResponseType> = (
   request: RequestType,
-  metadata?: grpc.Metadata,
-  canceled?: boolean
+  call?: grpc.ServerUnaryCall<RequestType>
 ) => Promise<ResponseType>;
 
 export type ReactiveServerRequestStreamMethod<RequestType, ResponseType> = (
   request: Observable<RequestType>,
-  metadata?: grpc.Metadata,
-  canceled?: boolean
+  call?: grpc.ServerReadableStream<RequestType>
 ) => Promise<ResponseType>;
 
 export type ReactiveServerResponseStreamMethod<RequestType, ResponseType> = (
   request: RequestType,
-  metadata?: grpc.Metadata,
-  canceled?: boolean
+  call?: grpc.ServerWritableStream<RequestType>
 ) => Observable<ResponseType>;
 
 export type ReactiveServerBidirectionalStreamMethod<
@@ -24,8 +21,7 @@ export type ReactiveServerBidirectionalStreamMethod<
   ResponseType
 > = (
   request: Observable<RequestType>,
-  metadata?: grpc.Metadata,
-  canceled?: boolean
+  call?: grpc.ServerDuplexStream<RequestType, ResponseType>
 ) => Observable<ResponseType>;
 
 export type ReactiveServerMethod<RequestType, ResponseType> =
