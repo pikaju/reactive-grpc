@@ -14,23 +14,16 @@ async function testServer(port: string) {
 
   async function addTwoNumbersTest(a: number, b: number) {
     console.log(`Testing addTwoNumbers with a=${a} and b=${b}...`);
-    const request = new TwoNumbers();
-    request.setA(a);
-    request.setB(b);
-    const response = await reactiveClient.addTwoNumbers(request);
+    const response = await reactiveClient.addTwoNumbers(
+      new TwoNumbers().setA(a).setB(b)
+    );
     console.log(`Result: ${response.getA()}`);
   }
 
   async function addStreamOfNumbersTest(numbers: Array<number>) {
     console.log(`Testing addSteamOfNumbers with ${numbers}...`);
     const response = await reactiveClient.addStreamOfNumbers(
-      from(numbers).pipe(
-        map((value: number) => {
-          const oneNumber = new OneNumber();
-          oneNumber.setA(value);
-          return oneNumber;
-        })
-      )
+      from(numbers).pipe(map((value: number) => new OneNumber().setA(value)))
     );
     console.log(`Result: ${response.getA()}`);
   }
@@ -51,13 +44,7 @@ async function testServer(port: string) {
   async function runningAverageTest(numbers: Array<number>) {
     console.log(`Testing runningAverage with ${numbers}...`);
     const response = await reactiveClient.runningAverage(
-      from(numbers).pipe(
-        map((value: number) => {
-          const oneNumber = new OneNumber();
-          oneNumber.setA(value);
-          return oneNumber;
-        })
-      )
+      from(numbers).pipe(map((value: number) => new OneNumber().setA(value)))
     );
     process.stdout.write("Result: ");
     await response

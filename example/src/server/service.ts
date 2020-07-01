@@ -8,19 +8,13 @@ import { ExampleService, IExampleServer } from "../generated/service_grpc_pb";
 
 export default defineService<IExampleServer>(ExampleService, {
   async addTwoNumbers(request: TwoNumbers): Promise<OneNumber> {
-    const result = new OneNumber();
-    result.setA(request.getA() + request.getB());
-    return result;
+    return new OneNumber().setA(request.getA() + request.getB());
   },
   addStreamOfNumbers(request: Observable<OneNumber>): Promise<OneNumber> {
     return request
       .pipe(
         reduce((acc, value) => acc + value.getA(), 0),
-        map((value) => {
-          const result = new OneNumber();
-          result.setA(value);
-          return result;
-        })
+        map((value) => new OneNumber().setA(value))
       )
       .toPromise();
   },
@@ -32,9 +26,7 @@ export default defineService<IExampleServer>(ExampleService, {
         let next = a + b;
         a = b;
         b = next;
-        const result = new OneNumber();
-        result.setA(a);
-        return result;
+        return new OneNumber().setA(a);
       })
     );
   },
@@ -43,9 +35,7 @@ export default defineService<IExampleServer>(ExampleService, {
     return request.pipe(
       map((value, index) => {
         average = (value.getA() + index * average) / (index + 1);
-        const result = new OneNumber();
-        result.setA(average);
-        return result;
+        return new OneNumber().setA(average);
       })
     );
   },
