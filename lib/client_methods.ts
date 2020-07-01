@@ -1,4 +1,4 @@
-import * as grpc from "@grpc/grpc-js";
+import * as grpc from "grpc";
 import { Observable } from "rxjs";
 
 export type ReactiveClientUnaryMethod<RequestType, ResponseType> = (
