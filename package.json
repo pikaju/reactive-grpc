@@ -16,12 +16,14 @@
     "build": "tsc",
     "prepare": "yarn run build"
   },
-  "dependencies": {
-    "grpc": "^1.24.3",
-    "rxjs": "^6.5.5"
-  },
   "devDependencies": {
+    "grpc": "^1.24.3",
     "prettier": "^2.0.5",
+    "rxjs": "^6.5.5",
     "typescript": "^3.9.5"
+  },
+  "peerDependencies": {
+    "grpc": ">=1.0.0 <2.0.0",
+    "rxjs": ">=6.0.0 <7.0.0"
   }
 }
