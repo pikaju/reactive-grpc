@@ -20,7 +20,6 @@
     "reactive-grpc": "file:../"
   },
   "devDependencies": {
-    "@types/google-protobuf": "^3.7.2",
     "grpc-tools": "^1.9.0",
     "grpc_tools_node_protoc_ts": "^4.1.0",
     "prettier": "^2.0.5",

@@ -4,9 +4,10 @@ import { map, reduce } from "rxjs/operators";
 import { defineService } from "reactive-grpc";
 
 import { OneNumber, TwoNumbers, Empty } from "../generated/service_pb";
-import { ExampleService, IExampleServer } from "../generated/service_grpc_pb";
+// @ts-ignore
+import { Example, IExampleServer } from "../generated/service_grpc_pb";
 
-export default defineService<IExampleServer>(ExampleService, {
+export default defineService<IExampleServer>(Example, {
   async addTwoNumbers(request: TwoNumbers): Promise<OneNumber> {
     const result = new OneNumber();
     result.setA(request.getA() + request.getB());

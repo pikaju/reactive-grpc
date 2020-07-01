@@ -10,7 +10,7 @@ mkdir $OUT_DIR
 
 ${GRPC_TOOLS_NODE_PROTOC} \
     --js_out="import_style=commonjs,binary:${OUT_DIR}" \
-    --ts_out="${OUT_DIR}" \
-    --grpc_out="${OUT_DIR}" \
+    --ts_out="generate_package_definition:${OUT_DIR}" \
+    --grpc_out="generate_package_definition:${OUT_DIR}" \
     -I="${PROTOS_DIR}" \
     ${PROTOS_DIR}/*.proto

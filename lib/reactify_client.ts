@@ -1,4 +1,4 @@
-import * as grpc from "grpc";
+import * as grpc from "@grpc/grpc-js";
 import { Observable } from "rxjs";
 import {
   ReactiveClientUnaryMethod,
@@ -42,6 +42,18 @@ type ReactiveClient<ClientType extends grpc.Client> = {
     : never;
 };
 
+function callWith(method: any, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>, callback?: Function) {
+  return method(new grpc.Metadata(), {}, callback);
+  // return metadata
+  //       ? options
+  //         ? method(metadata, options, callback)
+  //         : method(metadata, callback)
+  //       : options
+  //       ? method(options, callback)
+  //       : method(callback);
+}
+
+
 function reactifyUnaryMethod<RequestType, ResponseType>(
   method: any
 ): ReactiveClientUnaryMethod<RequestType, ResponseType> {
@@ -53,12 +65,7 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
     return new Promise((resolve, reject) => {
       const callback = (error: any, response: any) =>
         error ? reject(error) : resolve(response);
-      let call: grpc.ClientUnaryCall = method(
-        request,
-        metadata,
-        options,
-        callback
-      );
+      let call: grpc.ClientUnaryCall = callWith(method, metadata, options, callback);
     });
   };
 }
@@ -74,11 +81,8 @@ function reactifyRequestStreamMethod<RequestType, ResponseType>(
     return new Promise((resolve, reject) => {
       const callback = (error: any, response: any) =>
         error ? reject(error) : resolve(response);
-      const call: grpc.ClientWritableStream<RequestType> = method(
-        metadata,
-        options,
-        callback
-      );
+      const call: grpc.ClientWritableStream<RequestType> = callWith(method, metadata, options, callback);
+
       request.subscribe(
         (value) => call.write(value),
         (error) => call.destroy(error),
@@ -96,11 +100,7 @@ function reactifyResponseStreamMethod<RequestType, ResponseType>(
     metadata?: grpc.Metadata,
     options?: Partial<grpc.CallOptions>
   ) => {
-    let call: grpc.ClientReadableStream<ResponseType> = method(
-      request,
-      metadata,
-      options
-    );
+    let call: grpc.ClientReadableStream<ResponseType> = callWith(method, metadata, options);
     return observableFromClientStream(call);
   };
 }
@@ -113,10 +113,7 @@ function reactifyBidirectionalStreamMethod<RequestType, ResponseType>(
     metadata?: grpc.Metadata,
     options?: Partial<grpc.CallOptions>
   ) => {
-    let call: grpc.ClientDuplexStream<RequestType, ResponseType> = method(
-      metadata,
-      options
-    );
+    let call: grpc.ClientDuplexStream<RequestType, ResponseType> = callWith(method, metadata, options);
     request.subscribe(
       (value) => call.write(value),
       (error) => call.destroy(error),

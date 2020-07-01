@@ -17,10 +17,12 @@
     "prepare": "yarn run build"
   },
   "dependencies": {
-    "grpc": "^1.24.3",
+    "@grpc/grpc-js": "^1.1.1",
+    "google-auth-library": "^6.0.2",
     "rxjs": "^6.5.5"
   },
   "devDependencies": {
+    "@types/node": "^12.7.5",
     "prettier": "^2.0.5",
     "typescript": "^3.9.5"
   }

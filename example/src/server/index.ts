@@ -1,17 +1,23 @@
-import * as grpc from "grpc";
+import * as grpc from "@grpc/grpc-js";
 
-import { ExampleService, IExampleServer } from "../generated/service_grpc_pb";
+// @ts-ignore
+import { Example, IExampleServer } from "../generated/service_grpc_pb";
 
 import DefineMethodsExampleService from "./methods";
 import defineServiceExampleService from "./service";
 
-function launchServer(service: IExampleServer, port: string) {
+async function launchServer(service: IExampleServer, port: string) {
   const server = new grpc.Server();
-  server.addService(ExampleService, service);
-  server.bind(port, grpc.ServerCredentials.createInsecure());
+  // @ts-ignore
+  server.addService(Example, service);
+  await new Promise((resolve, reject) => {
+    server.bindAsync(port, grpc.ServerCredentials.createInsecure(), (error, port) => error ? reject(error) : resolve(port));
+  });
   server.start();
 }
 
-launchServer(new DefineMethodsExampleService(), "0.0.0.0:5001");
-launchServer(defineServiceExampleService, "0.0.0.0:5002");
-console.log("Servers running.");
+(async () => {
+  launchServer(new DefineMethodsExampleService(), "0.0.0.0:5001");
+  launchServer(defineServiceExampleService, "0.0.0.0:5002");
+  console.log("Servers running.");
+})();

@@ -1,5 +1,6 @@
 import { Observable } from "rxjs";
-import * as grpc from "grpc";
+import * as grpc from "@grpc/grpc-js";
+import { ServerReadableStream } from "@grpc/grpc-js/build/src/server-call";
 
 export function observableFromClientStream<T>(
   stream: grpc.ClientReadableStream<any> | grpc.ClientDuplexStream<any, any>
@@ -34,7 +35,7 @@ export function observableFromClientStream<T>(
 }
 
 export function observableFromServerStream<T>(
-  stream: grpc.ServerReadableStream<any> | grpc.ServerDuplexStream<any, any>
+  stream: ServerReadableStream<any, any> | grpc.ServerDuplexStream<any, any>
 ) {
   return new Observable<T>((subscriber) => {
     function dataHandler(data: any) {
