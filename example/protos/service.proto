@@ -12,6 +12,6 @@ message Empty {}
 message OneNumber { int32 a = 1; }
 
 message TwoNumbers {
-  int32 a = 1;
-  int32 b = 2;
+  float a = 1;
+  float b = 2;
 }

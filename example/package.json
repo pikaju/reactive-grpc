@@ -17,6 +17,7 @@
     "build": "yarn generate && yarn run tsc"
   },
   "dependencies": {
+    "google-protobuf": "^3.12.2",
     "reactive-grpc": "file:../"
   },
   "devDependencies": {

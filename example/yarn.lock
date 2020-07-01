@@ -800,6 +800,11 @@ google-protobuf@3.5.0:
   resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.5.0.tgz#b8cc63c74d83457bd8a9a904503c8efb26bca339"
   integrity sha1-uMxjx02DRXvYqakEUDyO+ya8ozk=
 
+google-protobuf@^3.12.2:
+  version "3.12.2"
+  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.12.2.tgz#50ce9f9b6281235724eb243d6a83e969a2176e53"
+  integrity sha512-4CZhpuRr1d6HjlyrxoXoocoGFnRYgKULgMtikMddA9ztRyYR59Aondv2FioyxWVamRo0rF2XpYawkTCBEQOSkA==
+
 grpc-tools@^1.9.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/grpc-tools/-/grpc-tools-1.9.0.tgz#57fd0f577dbf842e03215857582f5dc808d96cad"
