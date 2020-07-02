@@ -181,6 +181,7 @@ const observable = reactiveClient.getFibonacciNumbers(new OneNumber().setA(20));
 // The error will be ignored by the client.
 observable.pipe(take(5)).subscribe(
   (value) => console.log(value.getA()),
+  (err) => console.log("Oh no!"),
   () => console.log("Done!")
 );
 ```
