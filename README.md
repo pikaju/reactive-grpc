@@ -8,7 +8,7 @@ Works well in conjunction with [grpc-tools](https://www.npmjs.com/package/grpc-t
 class ExampleService implements IExampleServer {
   incrementStream(call: grpc.ServerDuplexStream<OneNumber, OneNumber>): void {
     call.on("data", (number) => {
-      call.write(new OneNumber().setA(number + 1));
+      call.write(new OneNumber().setA(number.getA() + 1));
     });
     call.on("end", () => call.end());
   }
@@ -19,7 +19,7 @@ class ExampleService implements IExampleServer {
 ```typescript
 defineService<IExampleServer>(ExampleService, {
   runningAverage(request: Observable<OneNumber>): Observable<OneNumber> {
-    return request.pipe(map((number) => new OneNumber().setA(number + 1)));
+    return request.pipe(map((number) => new OneNumber().setA(number.getA() + 1)));
   },
 });
 ```
