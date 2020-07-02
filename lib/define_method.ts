@@ -18,11 +18,17 @@ export function defineUnaryMethod<RequestType, ResponseType>(
     const result = method(call.request, call);
     result.then(
       (response) => {
-        const unaryResponse = response as ReactiveServerUnaryResponse<ResponseType>;
+        const unaryResponse = response as ReactiveServerUnaryResponse<
+          ResponseType
+        >;
         if (unaryResponse.value)
-          callback(null, unaryResponse.value, unaryResponse.trailer, unaryResponse.flags);
-        else
-          callback(null, response as ResponseType);
+          callback(
+            null,
+            unaryResponse.value,
+            unaryResponse.trailer,
+            unaryResponse.flags
+          );
+        else callback(null, response as ResponseType);
       },
       (reason) => callback(reason, null)
     );
@@ -40,11 +46,17 @@ export function defineRequestStreamMethod<RequestType, ResponseType>(
     const result = method(observable, call);
     result.then(
       (response) => {
-        const unaryResponse = response as ReactiveServerUnaryResponse<ResponseType>;
+        const unaryResponse = response as ReactiveServerUnaryResponse<
+          ResponseType
+        >;
         if (unaryResponse.value)
-          callback(null, unaryResponse.value, unaryResponse.trailer, unaryResponse.flags);
-        else
-          callback(null, response as ResponseType);
+          callback(
+            null,
+            unaryResponse.value,
+            unaryResponse.trailer,
+            unaryResponse.flags
+          );
+        else callback(null, response as ResponseType);
       },
       (reason) => callback(reason, null)
     );

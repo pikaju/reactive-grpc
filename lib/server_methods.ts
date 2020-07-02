@@ -9,17 +9,17 @@ export interface ReactiveServerUnaryResponse<ResponseType> {
 
 export type ReactiveServerUnaryMethod<RequestType, ResponseType> = (
   request: RequestType,
-  call?: grpc.ServerUnaryCall<RequestType>
+  call: grpc.ServerUnaryCall<RequestType>
 ) => Promise<ResponseType | ReactiveServerUnaryResponse<ResponseType>>;
 
 export type ReactiveServerRequestStreamMethod<RequestType, ResponseType> = (
   request: Observable<RequestType>,
-  call?: grpc.ServerReadableStream<RequestType>
+  call: grpc.ServerReadableStream<RequestType>
 ) => Promise<ResponseType | ReactiveServerUnaryResponse<ResponseType>>;
 
 export type ReactiveServerResponseStreamMethod<RequestType, ResponseType> = (
   request: RequestType,
-  call?: grpc.ServerWritableStream<RequestType>
+  call: grpc.ServerWritableStream<RequestType>
 ) => Observable<ResponseType>;
 
 export type ReactiveServerBidirectionalStreamMethod<
@@ -27,7 +27,7 @@ export type ReactiveServerBidirectionalStreamMethod<
   ResponseType
 > = (
   request: Observable<RequestType>,
-  call?: grpc.ServerDuplexStream<RequestType, ResponseType>
+  call: grpc.ServerDuplexStream<RequestType, ResponseType>
 ) => Observable<ResponseType>;
 
 export type ReactiveServerMethod<RequestType, ResponseType> =
