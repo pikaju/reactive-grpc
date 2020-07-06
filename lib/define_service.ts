@@ -12,6 +12,10 @@ import {
   defineBidirectionalStreamMethod,
 } from "./define_method";
 
+/**
+ * Mapped type that transforms all gRPC method signatures within the `IService` template type
+ * into their reactive counterparts so as to allow for type checking and inference.
+ */
 type ReactiveServer<IService> = {
   [rpc in keyof IService]: IService[rpc] extends grpc.handleUnaryCall<
     infer RequestType,
