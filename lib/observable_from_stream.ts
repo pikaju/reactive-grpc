@@ -1,6 +1,13 @@
 import { Observable } from "rxjs";
 import * as grpc from "grpc";
 
+/**
+ * Maps a regular stream object onto an RxJS `Observable` for the client to read.
+ * Only `"data"`, `"error"` and `"end"` events will be transformed.
+ * Subscribing to, and subsequently unsubscribing from the returned `Observable`
+ * will result in the cancellation of the stream.
+ * @param stream The stream to be transformed into an `Observable`.
+ */
 export function observableFromClientStream<T>(
   stream: grpc.ClientReadableStream<T> | grpc.ClientDuplexStream<any, T>
 ) {
@@ -33,6 +40,11 @@ export function observableFromClientStream<T>(
   });
 }
 
+/**
+ * Maps a regular stream object onto an RxJS `Observable` for the server to read.
+ * Only `"data"`, `"error"` and `"end"` events will be transformed.
+ * @param stream The stream to be transformed into an `Observable`.
+ */
 export function observableFromServerStream<T>(
   stream: grpc.ServerReadableStream<T> | grpc.ServerDuplexStream<T, any>
 ) {

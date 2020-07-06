@@ -8,6 +8,12 @@ import {
 } from "./server_methods";
 import { observableFromServerStream } from "./observable_from_stream";
 
+/**
+ * Calls the specified callback after the promise has finished based on the
+ * the value or error the promise completed with.
+ * @param callback gRPC callback for server implementations.
+ * @param result Return value of a reactive server method.
+ */
 function handleUnaryResult<ResponseType>(
   callback: grpc.sendUnaryData<ResponseType>,
   result: Promise<ResponseType | ReactiveServerUnaryResponse<ResponseType>>
@@ -30,6 +36,11 @@ function handleUnaryResult<ResponseType>(
   );
 }
 
+/**
+ * Wraps a single reactive unary method with its non-reactive counterpart.
+ * @param method The reactive method to be wrapped.
+ * @returns A standard gRPC method.
+ */
 export function defineUnaryMethod<RequestType, ResponseType>(
   method: ReactiveServerUnaryMethod<RequestType, ResponseType>
 ): grpc.handleUnaryCall<RequestType, ResponseType> {
@@ -41,6 +52,12 @@ export function defineUnaryMethod<RequestType, ResponseType>(
   };
 }
 
+/**
+ * Wraps a single reactive method with a stream request and unary response 
+ * with its non-reactive counterpart.
+ * @param method The reactive method to be wrapped.
+ * @returns A standard gRPC method.
+ */
 export function defineRequestStreamMethod<RequestType, ResponseType>(
   method: ReactiveServerRequestStreamMethod<RequestType, ResponseType>
 ): grpc.handleClientStreamingCall<RequestType, ResponseType> {
@@ -53,6 +70,12 @@ export function defineRequestStreamMethod<RequestType, ResponseType>(
   };
 }
 
+/**
+ * Wraps a single reactive method with a unary request and stream response 
+ * with its non-reactive counterpart.
+ * @param method The reactive method to be wrapped.
+ * @returns A standard gRPC method.
+ */
 export function defineResponseStreamMethod<RequestType, ResponseType>(
   method: ReactiveServerResponseStreamMethod<RequestType, ResponseType>
 ): grpc.handleServerStreamingCall<RequestType, ResponseType> {
@@ -67,6 +90,12 @@ export function defineResponseStreamMethod<RequestType, ResponseType>(
   };
 }
 
+/**
+ * Wraps a single reactive method with a stream request and response 
+ * with its non-reactive counterpart.
+ * @param method The reactive method to be wrapped.
+ * @returns A standard gRPC method.
+ */
 export function defineBidirectionalStreamMethod<RequestType, ResponseType>(
   method: ReactiveServerBidirectionalStreamMethod<RequestType, ResponseType>
 ): grpc.handleBidiStreamingCall<RequestType, ResponseType> {

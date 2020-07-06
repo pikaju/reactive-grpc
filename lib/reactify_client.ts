@@ -8,6 +8,11 @@ import {
 } from "./client_methods";
 import { observableFromClientStream } from "./observable_from_stream";
 
+
+/**
+ * Mapped type that transforms all gRPC method signatures within the gRPC client
+ * into their reactive counterparts.
+ */
 type ReactiveClient<ClientType extends grpc.Client> = {
   [rpc in keyof ClientType]: ClientType[rpc] extends (
     metadata: grpc.Metadata,
@@ -42,6 +47,12 @@ type ReactiveClient<ClientType extends grpc.Client> = {
     : never;
 };
 
+/**
+ * Wraps a single gRPC client method with unary request and response types
+ * with its reactive counterpart.
+ * @param method The gRPC client method to be wrapped.
+ * @returns A reactive version of the standard method.
+ */
 function reactifyUnaryMethod<RequestType, ResponseType>(
   method: any
 ): ReactiveClientUnaryMethod<RequestType, ResponseType> {
@@ -63,6 +74,12 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
   };
 }
 
+/**
+ * Wraps a single gRPC client method with streaming request and unary response types
+ * with its reactive counterpart.
+ * @param method The gRPC client method to be wrapped.
+ * @returns A reactive version of the standard method.
+ */
 function reactifyRequestStreamMethod<RequestType, ResponseType>(
   method: any
 ): ReactiveClientRequestStreamMethod<RequestType, ResponseType> {
@@ -88,6 +105,12 @@ function reactifyRequestStreamMethod<RequestType, ResponseType>(
   };
 }
 
+/**
+ * Wraps a single gRPC client method with unary request and streaming response types
+ * with its reactive counterpart.
+ * @param method The gRPC client method to be wrapped.
+ * @returns A reactive version of the standard method.
+ */
 function reactifyResponseStreamMethod<RequestType, ResponseType>(
   method: any
 ): ReactiveClientResponseStreamMethod<RequestType, ResponseType> {
@@ -105,6 +128,12 @@ function reactifyResponseStreamMethod<RequestType, ResponseType>(
   };
 }
 
+/**
+ * Wraps a single gRPC client method with streaming request and response types
+ * with its reactive counterpart.
+ * @param method The gRPC client method to be wrapped.
+ * @returns A reactive version of the standard method.
+ */
 function reactifyBidirectionalStreamMethod<RequestType, ResponseType>(
   method: any
 ): ReactiveClientBidirectionalStreamMethod<RequestType, ResponseType> {
@@ -126,6 +155,12 @@ function reactifyBidirectionalStreamMethod<RequestType, ResponseType>(
   };
 }
 
+/**
+ * Wraps a non-reactive gRPC client so that all methods can be called reactively.
+ * @param serviceDefinition The gRPC service definition which the client implements.
+ * @param client The standard non-reactive gRPC client to be wrapped.
+ * @returns A reactive client which uses the regular client.
+ */
 export function reactifyClient<ClientType extends grpc.Client>(
   serviceDefinition: grpc.ServiceDefinition<grpc.UntypedServiceImplementation>,
   client: ClientType
