@@ -39,7 +39,7 @@ type ReactiveServer<IService> = {
     ? ReactiveServerBidirectionalStreamMethod<RequestType, ResponseType>
     : never;
 } & {
-  [propName: string]: any
+  [propName: string]: any;
 };
 
 /**
@@ -52,7 +52,7 @@ type ReactiveServer<IService> = {
  */
 export function defineService<IServer>(
   serviceDefinition: grpc.ServiceDefinition<grpc.UntypedServiceImplementation>,
-  service: ReactiveServer<IServer>,
+  service: ReactiveServer<IServer>
 ): IServer {
   const server: any = {};
   for (const [key, value] of Object.entries(serviceDefinition)) {

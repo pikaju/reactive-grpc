@@ -53,7 +53,7 @@ export function defineUnaryMethod<RequestType, ResponseType>(
 }
 
 /**
- * Wraps a single reactive method with a stream request and unary response 
+ * Wraps a single reactive method with a stream request and unary response
  * with its non-reactive counterpart.
  * @param method The reactive method to be wrapped.
  * @returns A standard gRPC method.
@@ -71,7 +71,7 @@ export function defineRequestStreamMethod<RequestType, ResponseType>(
 }
 
 /**
- * Wraps a single reactive method with a unary request and stream response 
+ * Wraps a single reactive method with a unary request and stream response
  * with its non-reactive counterpart.
  * @param method The reactive method to be wrapped.
  * @returns A standard gRPC method.
@@ -91,7 +91,7 @@ export function defineResponseStreamMethod<RequestType, ResponseType>(
 }
 
 /**
- * Wraps a single reactive method with a stream request and response 
+ * Wraps a single reactive method with a stream request and response
  * with its non-reactive counterpart.
  * @param method The reactive method to be wrapped.
  * @returns A standard gRPC method.

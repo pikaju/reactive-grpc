@@ -173,6 +173,10 @@ observable.subscribe(
 );
 ```
 Optionally, you can also supply Metadata and CallOptions as the second and third parameters of the calls.
+To retrieve the standard gRPC call object, use `.call` on the returned Promise or Observable:
+```typescript
+console.log(observable.call);
+```
 
 Note that unsubscribing from a server side stream will automatically cancel the request:
 ```typescript

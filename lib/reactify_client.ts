@@ -7,7 +7,7 @@ import {
   ReactiveClientBidirectionalStreamMethod,
 } from "./client_methods";
 import { observableFromClientStream } from "./observable_from_stream";
-
+import { ReactiveServerRequestStreamMethod } from "./server_methods";
 
 /**
  * Mapped type that transforms all gRPC method signatures within the gRPC client
@@ -61,16 +61,14 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
     metadata?: grpc.Metadata,
     options?: Partial<grpc.CallOptions>
   ) => {
-    return new Promise((resolve, reject) => {
+    let call: grpc.ClientUnaryCall | undefined;
+    const result = new Promise((resolve, reject) => {
       const callback = (error: any, response: any) =>
         error ? reject(error) : resolve(response);
-      let call: grpc.ClientUnaryCall = method(
-        request,
-        metadata,
-        options,
-        callback
-      );
-    });
+      call = method(request, metadata, options, callback);
+    }) as ReturnType<ReactiveClientUnaryMethod<RequestType, ResponseType>>;
+    result.call = call!;
+    return result;
   };
 }
 
@@ -88,20 +86,21 @@ function reactifyRequestStreamMethod<RequestType, ResponseType>(
     metadata?: grpc.Metadata,
     options?: Partial<grpc.CallOptions>
   ) => {
-    return new Promise((resolve, reject) => {
+    let call: grpc.ClientWritableStream<RequestType> | undefined;
+    const result = new Promise((resolve, reject) => {
       const callback = (error: any, response: any) =>
         error ? reject(error) : resolve(response);
-      const call: grpc.ClientWritableStream<RequestType> = method(
-        metadata,
-        options,
-        callback
-      );
+      call = method(metadata, options, callback);
       request.subscribe(
-        (value) => call.write(value),
-        (error) => call.destroy(error),
-        () => call.end()
+        (value) => call!.write(value),
+        (error) => call!.destroy(error),
+        () => call!.end()
       );
-    });
+    }) as ReturnType<
+      ReactiveClientRequestStreamMethod<RequestType, ResponseType>
+    >;
+    result.call = call!;
+    return result;
   };
 }
 
@@ -124,7 +123,11 @@ function reactifyResponseStreamMethod<RequestType, ResponseType>(
       metadata,
       options
     );
-    return observableFromClientStream(call);
+    const result = observableFromClientStream(call) as ReturnType<
+      ReactiveClientResponseStreamMethod<RequestType, ResponseType>
+    >;
+    result.call = call;
+    return result;
   };
 }
 
@@ -151,7 +154,11 @@ function reactifyBidirectionalStreamMethod<RequestType, ResponseType>(
       (error) => call.destroy(error),
       () => call.end()
     );
-    return observableFromClientStream(call);
+    const result = observableFromClientStream(call) as ReturnType<
+      ReactiveClientBidirectionalStreamMethod<RequestType, ResponseType>
+    >;
+    result.call = call;
+    return result;
   };
 }
 
