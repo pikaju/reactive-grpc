@@ -61,13 +61,13 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
     metadata?: grpc.Metadata,
     options?: Partial<grpc.CallOptions>
   ) => {
-    let call: grpc.ClientUnaryCall | undefined;
+    let call!: grpc.ClientUnaryCall;
     const result = new Promise((resolve, reject) => {
       const callback = (error: any, response: any) =>
         error ? reject(error) : resolve(response);
       call = method(request, metadata, options, callback);
     }) as ReturnType<ReactiveClientUnaryMethod<RequestType, ResponseType>>;
-    result.call = call!;
+    result.call = call;
     return result;
   };
 }
@@ -86,7 +86,7 @@ function reactifyRequestStreamMethod<RequestType, ResponseType>(
     metadata?: grpc.Metadata,
     options?: Partial<grpc.CallOptions>
   ) => {
-    let call: grpc.ClientWritableStream<RequestType> | undefined;
+    let call!: grpc.ClientWritableStream<RequestType>;
     const result = new Promise((resolve, reject) => {
       const callback = (error: any, response: any) =>
         error ? reject(error) : resolve(response);
@@ -99,7 +99,7 @@ function reactifyRequestStreamMethod<RequestType, ResponseType>(
     }) as ReturnType<
       ReactiveClientRequestStreamMethod<RequestType, ResponseType>
     >;
-    result.call = call!;
+    result.call = call;
     return result;
   };
 }
