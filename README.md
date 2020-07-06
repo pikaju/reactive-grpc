@@ -18,7 +18,7 @@ class ExampleService implements IExampleServer {
 #### After
 ```typescript
 defineService<IExampleServer>(ExampleService, {
-  runningAverage(request: Observable<OneNumber>): Observable<OneNumber> {
+  incrementStream(request: Observable<OneNumber>): Observable<OneNumber> {
     return request.pipe(map((number) => new OneNumber().setA(number.getA() + 1)));
   },
 });
