@@ -11,6 +11,7 @@ import {
 import { OneNumber, TwoNumbers, Empty } from "../generated/service_pb";
 import { IExampleServer } from "../generated/service_grpc_pb";
 
+/** Server of the example service that wraps each method individually. */
 export default class ExampleServer implements IExampleServer {
   addTwoNumbers = defineUnaryMethod(async function (
     request: TwoNumbers
