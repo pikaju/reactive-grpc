@@ -8,6 +8,28 @@ import {
 } from "./server_methods";
 import { observableFromServerStream } from "./observable_from_stream";
 
+function handleUnaryResult<ResponseType>(
+  callback: grpc.sendUnaryData<ResponseType>,
+  result: Promise<ResponseType | ReactiveServerUnaryResponse<ResponseType>>
+): void {
+  result.then(
+    (response) => {
+      const unaryResponse = response as ReactiveServerUnaryResponse<
+        ResponseType
+      >;
+      if (unaryResponse.value)
+        callback(
+          null,
+          unaryResponse.value,
+          unaryResponse.trailer,
+          unaryResponse.flags
+        );
+      else callback(null, response as ResponseType);
+    },
+    (reason) => callback(reason, null)
+  );
+}
+
 export function defineUnaryMethod<RequestType, ResponseType>(
   method: ReactiveServerUnaryMethod<RequestType, ResponseType>
 ): grpc.handleUnaryCall<RequestType, ResponseType> {
@@ -15,23 +37,7 @@ export function defineUnaryMethod<RequestType, ResponseType>(
     call: grpc.ServerUnaryCall<RequestType>,
     callback: grpc.sendUnaryData<ResponseType>
   ): void => {
-    const result = method(call.request, call);
-    result.then(
-      (response) => {
-        const unaryResponse = response as ReactiveServerUnaryResponse<
-          ResponseType
-        >;
-        if (unaryResponse.value)
-          callback(
-            null,
-            unaryResponse.value,
-            unaryResponse.trailer,
-            unaryResponse.flags
-          );
-        else callback(null, response as ResponseType);
-      },
-      (reason) => callback(reason, null)
-    );
+    handleUnaryResult(callback, method(call.request, call));
   };
 }
 
@@ -43,23 +49,7 @@ export function defineRequestStreamMethod<RequestType, ResponseType>(
     callback: grpc.sendUnaryData<ResponseType>
   ): void => {
     const observable = observableFromServerStream<RequestType>(call);
-    const result = method(observable, call);
-    result.then(
-      (response) => {
-        const unaryResponse = response as ReactiveServerUnaryResponse<
-          ResponseType
-        >;
-        if (unaryResponse.value)
-          callback(
-            null,
-            unaryResponse.value,
-            unaryResponse.trailer,
-            unaryResponse.flags
-          );
-        else callback(null, response as ResponseType);
-      },
-      (reason) => callback(reason, null)
-    );
+    handleUnaryResult(callback, method(observable, call));
   };
 }
 
