@@ -18,7 +18,6 @@ export function observableFromClientStream<T>(
 
     function errorHandler(error: any) {
       subscriber.error(error);
-      subscriber.complete();
     }
 
     function endHandler() {
@@ -55,7 +54,6 @@ export function observableFromServerStream<T>(
 
     function errorHandler(error: any) {
       subscriber.error(error);
-      subscriber.complete();
     }
 
     function endHandler() {
