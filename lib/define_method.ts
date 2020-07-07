@@ -1,4 +1,6 @@
-import * as grpc from "grpc";
+import * as grpc from "@grpc/grpc-js";
+import { handleClientStreamingCall } from "@grpc/grpc-js/build/src/server-call";
+
 import {
   ReactiveServerUnaryResponse,
   ReactiveServerUnaryMethod,
@@ -45,10 +47,10 @@ export function defineUnaryMethod<RequestType, ResponseType>(
   method: ReactiveServerUnaryMethod<RequestType, ResponseType>
 ): grpc.handleUnaryCall<RequestType, ResponseType> {
   return (
-    call: grpc.ServerUnaryCall<RequestType>,
+    call: grpc.ServerUnaryCall<RequestType, ResponseType>,
     callback: grpc.sendUnaryData<ResponseType>
   ): void => {
-    handleUnaryResult(callback, method(call.request, call));
+    handleUnaryResult(callback, method(call.request!, call));
   };
 }
 
@@ -60,9 +62,9 @@ export function defineUnaryMethod<RequestType, ResponseType>(
  */
 export function defineRequestStreamMethod<RequestType, ResponseType>(
   method: ReactiveServerRequestStreamMethod<RequestType, ResponseType>
-): grpc.handleClientStreamingCall<RequestType, ResponseType> {
+): handleClientStreamingCall<RequestType, ResponseType> {
   return (
-    call: grpc.ServerReadableStream<RequestType>,
+    call: grpc.ServerReadableStream<RequestType, ResponseType>,
     callback: grpc.sendUnaryData<ResponseType>
   ): void => {
     const observable = observableFromServerStream<RequestType>(call);
@@ -79,8 +81,8 @@ export function defineRequestStreamMethod<RequestType, ResponseType>(
 export function defineResponseStreamMethod<RequestType, ResponseType>(
   method: ReactiveServerResponseStreamMethod<RequestType, ResponseType>
 ): grpc.handleServerStreamingCall<RequestType, ResponseType> {
-  return (call: grpc.ServerWritableStream<RequestType>): void => {
-    const result = method(call.request, call);
+  return (call: grpc.ServerWritableStream<RequestType, ResponseType>): void => {
+    const result = method(call.request!, call);
     const subscription = result.subscribe(
       (value) => call.write(value),
       (error) => call.destroy(error),

@@ -1,5 +1,5 @@
 import { Observable } from "rxjs";
-import * as grpc from "grpc";
+import * as grpc from "@grpc/grpc-js";
 
 /**
  * Maps a regular stream object onto an RxJS `Observable` for the client to read.
@@ -45,7 +45,7 @@ export function observableFromClientStream<T>(
  * @param stream The stream to be transformed into an `Observable`.
  */
 export function observableFromServerStream<T>(
-  stream: grpc.ServerReadableStream<T> | grpc.ServerDuplexStream<T, any>
+  stream: grpc.ServerReadableStream<T, any> | grpc.ServerDuplexStream<T, any>
 ) {
   return new Observable<T>((subscriber) => {
     function dataHandler(data: any) {

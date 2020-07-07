@@ -1,4 +1,4 @@
-import * as grpc from "grpc";
+import * as grpc from "@grpc/grpc-js";
 import { Observable } from "rxjs";
 
 /** Reactive signature for client methods with unary request and response types. */

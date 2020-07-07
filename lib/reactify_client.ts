@@ -1,4 +1,4 @@
-import * as grpc from "grpc";
+import * as grpc from "@grpc/grpc-js";
 import { Observable } from "rxjs";
 import {
   ReactiveClientUnaryMethod,
@@ -7,7 +7,6 @@ import {
   ReactiveClientBidirectionalStreamMethod,
 } from "./client_methods";
 import { observableFromClientStream } from "./observable_from_stream";
-import { ReactiveServerRequestStreamMethod } from "./server_methods";
 
 /**
  * Mapped type that transforms all gRPC method signatures within the gRPC client
@@ -65,7 +64,9 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
     const result = new Promise((resolve, reject) => {
       const callback = (error: any, response: any) =>
         error ? reject(error) : resolve(response);
-      call = method(request, metadata, options, callback);
+      metadata = metadata || new grpc.Metadata();
+      if (options) call = method(request, metadata, options, callback);
+      else call = method(request, metadata, callback);
     }) as ReturnType<ReactiveClientUnaryMethod<RequestType, ResponseType>>;
     result.call = call;
     return result;
@@ -90,7 +91,9 @@ function reactifyRequestStreamMethod<RequestType, ResponseType>(
     const result = new Promise((resolve, reject) => {
       const callback = (error: any, response: any) =>
         error ? reject(error) : resolve(response);
-      call = method(metadata, options, callback);
+      metadata = metadata || new grpc.Metadata();
+      if (options) call = method(metadata, options, callback);
+      else call = method(metadata, callback);
       request.subscribe(
         (value) => call!.write(value),
         (error) => call!.destroy(error),

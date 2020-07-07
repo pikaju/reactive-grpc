@@ -1,4 +1,6 @@
-import * as grpc from "grpc";
+import * as grpc from "@grpc/grpc-js";
+import { handleClientStreamingCall } from "@grpc/grpc-js/build/src/server-call";
+
 import {
   ReactiveServerUnaryMethod,
   ReactiveServerRequestStreamMethod,
@@ -22,7 +24,7 @@ type ReactiveServer<IService> = {
     infer ResponseType
   >
     ? ReactiveServerUnaryMethod<RequestType, ResponseType>
-    : IService[rpc] extends grpc.handleClientStreamingCall<
+    : IService[rpc] extends handleClientStreamingCall<
         infer RequestType,
         infer ResponseType
       >
