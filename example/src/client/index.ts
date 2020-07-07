@@ -43,7 +43,7 @@ async function testServer(port: string) {
 
   async function runningAverageTest(numbers: Array<number>) {
     console.log(`Testing runningAverage with ${numbers}...`);
-    const response = await reactiveClient.runningAverage(
+    const response = reactiveClient.runningAverage(
       from(numbers).pipe(map((value: number) => new OneNumber().setA(value)))
     );
     process.stdout.write("Result: ");
