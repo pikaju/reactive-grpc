@@ -1,0 +1,33 @@
+{
+  "name": "reactive-grpc-example",
+  "version": "0.0.1",
+  "author": {
+    "name": "Julien Scholz",
+    "email": "julienscholzo@hotmail.de"
+  },
+  "files": [
+    "src/**/*",
+    "generated/**/*"
+  ],
+  "scripts": {
+    "generate": "bash generate.sh",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "client": "yarn generate && ts-node src/client/",
+    "serve": "yarn generate && ts-node src/server/",
+    "build": "yarn generate && yarn run tsc"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.1.1",
+    "google-protobuf": "^3.12.2",
+    "reactive-grpc": "file:../",
+    "rxjs": "^6.5.5"
+  },
+  "devDependencies": {
+    "@types/google-protobuf": "^3.7.2",
+    "grpc-tools": "^1.9.0",
+    "grpc_tools_node_protoc_ts": "^4.1.0",
+    "prettier": "^2.0.5",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.5"
+  }
+}
