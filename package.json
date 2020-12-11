@@ -19,6 +19,7 @@
   "devDependencies": {
     "@grpc/grpc-js": "^1.2.2",
     "@types/node": "^14.0.18",
+    "grpc-web": "^1.2.1",
     "prettier": "^2.0.5",
     "rxjs": "^6.5.5",
     "typescript": "^3.9.5"
