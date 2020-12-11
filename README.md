@@ -1,6 +1,6 @@
 # RxJS wrapper for gRPC and TypeScript
 
-A package that wraps the callback and event based [official gRPC implementation](https://www.npmjs.com/package/grpc) with Promises and RxJS Observables.
+A package that wraps the callback and event based [official gRPC implementation](https://www.npmjs.com/package/@grpc/grpc-js) with Promises and RxJS Observables.
 Works well in conjunction with [grpc-tools](https://www.npmjs.com/package/grpc-tools) and [grpc_tools_node_protoc_ts](https://www.npmjs.com/package/grpc_tools_node_protoc_ts).
 
 #### Before
