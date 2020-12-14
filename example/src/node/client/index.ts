@@ -2,26 +2,15 @@ import * as grpc from "@grpc/grpc-js";
 import { from } from "rxjs";
 import { map, take } from "rxjs/operators";
 
-import { TwoNumbers, OneNumber, Empty } from "../generated/service_pb";
-import * as serviceGrpcPb from "../generated/service_grpc_pb";
-
 import { reactifyClient } from "reactive-grpc";
 
-const ExampleClient = grpc.makeClientConstructor(
-  (serviceGrpcPb as any)["Example"],
-  "ExampleService"
-);
+import { TwoNumbers, OneNumber, Empty } from "../generated/service_pb";
+import { ExampleClient, ExampleService } from "../generated/service_grpc_pb";
 
 async function testServer(port: string) {
   console.log(`Testing server "${port}":`);
-  const client = (new ExampleClient(
-    port,
-    grpc.credentials.createInsecure()
-  ) as unknown) as serviceGrpcPb.ExampleClient;
-  const reactiveClient = reactifyClient(
-    (serviceGrpcPb as any)["Example"],
-    client
-  );
+  const client = new ExampleClient(port, grpc.credentials.createInsecure());
+  const reactiveClient = reactifyClient(ExampleService, client);
 
   async function addTwoNumbersTest(a: number, b: number) {
     console.log(`Testing addTwoNumbers with a=${a} and b=${b}...`);

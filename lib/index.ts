@@ -1,2 +1,2 @@
-export * from './nodejs';
+export * from "./node";
 // export * from './web';

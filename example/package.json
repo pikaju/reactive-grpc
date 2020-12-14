@@ -18,6 +18,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.2.2",
     "google-protobuf": "^3.12.2",
+    "grpc-web": "^1.2.1",
     "reactive-grpc": "file:../",
     "rxjs": "^6.5.5"
   },

@@ -1,1 +1,1 @@
-import * as grpbWeb from 'grpc-web';
+import * as grpbWeb from "grpc-web";

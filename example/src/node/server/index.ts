@@ -1,15 +1,13 @@
 import * as grpc from "@grpc/grpc-js";
 
-import { IExampleServer } from "../generated/service_grpc_pb";
-import * as serviceGrpcPb from "../generated/service_grpc_pb";
+import { ExampleService, IExampleServer } from "../generated/service_grpc_pb";
 
 import DefineMethodsExampleService from "./methods";
 import defineServiceExampleService from "./service";
 
 async function launchServer(service: IExampleServer, port: string) {
   const server = new grpc.Server();
-  // @ts-ignore
-  server.addService(serviceGrpcPb["Example"], service);
+  server.addService(ExampleService, service);
   await new Promise((resolve, reject) => {
     server.bindAsync(
       port,

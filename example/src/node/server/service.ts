@@ -4,12 +4,11 @@ import { map, reduce } from "rxjs/operators";
 import { defineService } from "reactive-grpc";
 
 import { OneNumber, TwoNumbers, Empty } from "../generated/service_pb";
-import { IExampleServer } from "../generated/service_grpc_pb";
-import * as serviceGrpcPb from "../generated/service_grpc_pb";
+import { ExampleService, IExampleServer } from "../generated/service_grpc_pb";
 
 /** Reactive server of the example service. */
 export default defineService<IExampleServer>(
-  (serviceGrpcPb as any)["Example"],
+  ExampleService,
   {
     async addTwoNumbers(request: TwoNumbers): Promise<OneNumber> {
       return new OneNumber().setA(request.getA() + request.getB());
