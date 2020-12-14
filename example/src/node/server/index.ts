@@ -7,7 +7,7 @@ import defineServiceExampleService from "./service";
 
 async function launchServer(service: IExampleServer, port: string) {
   const server = new grpc.Server();
-  server.addService(ExampleService, service);
+  server.addService(ExampleService, service as unknown as grpc.UntypedServiceImplementation);
   await new Promise((resolve, reject) => {
     server.bindAsync(
       port,

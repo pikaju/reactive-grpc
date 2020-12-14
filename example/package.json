@@ -11,9 +11,9 @@
   "scripts": {
     "generate": "bash generate.sh",
     "format": "prettier --write \"src/**/*.ts\"",
-    "client": "yarn generate && ts-node src/client/",
-    "serve": "yarn generate && ts-node src/server/",
-    "build": "yarn generate && yarn run tsc"
+    "demo:node:client": "yarn generate && ts-node src/node/client/",
+    "demo:node:server": "yarn generate && ts-node src/node/server/",
+    "demo:web:client": "yarn generate && ts-node src/web/client"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.2.2",
