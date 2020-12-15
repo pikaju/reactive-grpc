@@ -11,9 +11,9 @@
   "scripts": {
     "generate": "bash generate.sh",
     "format": "prettier --write \"src/**/*.ts\"",
-    "demo:node:client": "yarn generate && ts-node src/node/client/",
-    "demo:node:server": "yarn generate && ts-node src/node/server/",
-    "demo:web:client": "yarn generate && ts-node src/web/client"
+    "demo:node:client": "ts-node src/node/client/",
+    "demo:node:server": "ts-node src/node/server/",
+    "demo:web:client": "ts-node src/web/client/"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.2.2",
@@ -26,8 +26,14 @@
     "@types/google-protobuf": "^3.7.2",
     "grpc-tools": "^1.10.0",
     "grpc_tools_node_protoc_ts": "^5.0.1",
+    "html-webpack-plugin": "^4.5.0",
     "prettier": "^2.0.5",
+    "protoc-gen-grpc-web": "^1.2.1",
+    "ts-loader": "^8.0.12",
     "ts-node": "^8.10.2",
-    "typescript": "^3.9.5"
+    "typescript": "^3.9.5",
+    "webpack": "^5.10.2",
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.0"
   }
 }
