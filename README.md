@@ -196,7 +196,7 @@ observable.pipe(take(5)).subscribe(
 ```
 
 ### Web client
-To create a reactive gRPC client for use in a browser (e.g. with webpack), you must first create a regular client instance, and then apply `reactive-grpc`'s `reactifyWebClient` function:
+To create a reactive gRPC client for use in a browser (e.g. with webpack), you must first create a regular client instance, and then apply `reactive-grpc`'s `reactifyWebClient` function. Make sure to use the generated client which uses callbacks, not promises, for reactification:
 ```typescript
 import * as grpc from 'grpc-web';
 import { reactifyWebClient } from 'reactive-grpc';
