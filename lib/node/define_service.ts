@@ -1,5 +1,5 @@
 import * as grpc from '@grpc/grpc-js';
-import { handleClientStreamingCall, } from '@grpc/grpc-js/build/src/server-call';
+import { handleClientStreamingCall } from '@grpc/grpc-js/build/src/server-call';
 
 import {
   ReactiveServerUnaryMethod,
@@ -55,7 +55,7 @@ export function defineService<IServer>(
   service: ReactiveServer<IServer>
 ): IServer {
   const server = {} as Record<string, Function>;
-  for (const [key, value,] of Object.entries(serviceDefinition)) {
+  for (const [key, value] of Object.entries(serviceDefinition)) {
     const method = (service as unknown as Record<string, Function>)[key].bind(service);
     if (!value.requestStream && !value.responseStream) {
       server[key] = defineUnaryMethod(method);

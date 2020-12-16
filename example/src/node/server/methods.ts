@@ -1,5 +1,5 @@
-import { interval, Observable, } from 'rxjs';
-import { map, reduce, } from 'rxjs/operators';
+import { interval, Observable } from 'rxjs';
+import { map, reduce } from 'rxjs/operators';
 
 import {
   defineUnaryMethod,
@@ -8,8 +8,8 @@ import {
   defineBidirectionalStreamMethod,
 } from 'reactive-grpc';
 
-import { OneNumber, TwoNumbers, Empty, } from '../generated/service_pb';
-import { IExampleServer, } from '../generated/service_grpc_pb';
+import { OneNumber, TwoNumbers, Empty } from '../generated/service_pb';
+import { IExampleServer } from '../generated/service_grpc_pb';
 
 /** Server of the example service that wraps each method individually. */
 export default class ExampleServer implements IExampleServer {

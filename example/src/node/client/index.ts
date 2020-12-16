@@ -1,11 +1,11 @@
 import * as grpc from '@grpc/grpc-js';
-import { from, } from 'rxjs';
-import { map, take, } from 'rxjs/operators';
+import { from } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 
-import { reactifyClient, } from 'reactive-grpc';
+import { reactifyClient } from 'reactive-grpc';
 
-import { TwoNumbers, OneNumber, Empty, } from '../generated/service_pb';
-import { ExampleClient, ExampleService, } from '../generated/service_grpc_pb';
+import { TwoNumbers, OneNumber, Empty } from '../generated/service_pb';
+import { ExampleClient, ExampleService } from '../generated/service_grpc_pb';
 
 async function testServer(port: string) {
   console.log(`Testing server "${port}":`);
@@ -54,9 +54,9 @@ async function testServer(port: string) {
   }
 
   await addTwoNumbersTest(3, 5);
-  await addStreamOfNumbersTest([1, 2, 3, 4,]);
+  await addStreamOfNumbersTest([1, 2, 3, 4]);
   await getFibonacciSequenceTest(5);
-  await runningAverageTest([0, 10, 20, 50,]);
+  await runningAverageTest([0, 10, 20, 50]);
   console.log('');
 }
 

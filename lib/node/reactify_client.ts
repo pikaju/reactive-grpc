@@ -1,12 +1,12 @@
 import * as grpc from '@grpc/grpc-js';
-import { Observable, } from 'rxjs';
+import { Observable } from 'rxjs';
 import {
   ReactiveClientUnaryMethod,
   ReactiveClientRequestStreamMethod,
   ReactiveClientResponseStreamMethod,
   ReactiveClientBidirectionalStreamMethod,
 } from './client_methods';
-import { observableFromStream, } from '../observable_from_stream';
+import { observableFromStream } from '../observable_from_stream';
 
 /**
  * Mapped type that transforms all gRPC method signatures within the gRPC client
@@ -149,7 +149,7 @@ export function reactifyClient<ClientType extends grpc.Client>(
   client: ClientType
 ): ReactiveClient<ClientType> {
   const reactiveClient  = {} as ReactiveClient<ClientType>;
-  for (const [key, value,] of Object.entries(serviceDefinition)) {
+  for (const [key, value] of Object.entries(serviceDefinition)) {
     const method = (client as unknown as Record<string, Function>)[key].bind(client);
     if (!value.requestStream && !value.responseStream) {
       (reactiveClient as Record<string, Function>)[key] = reactifyUnaryMethod(method);

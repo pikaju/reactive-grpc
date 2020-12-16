@@ -1,5 +1,5 @@
 import * as grpc from '@grpc/grpc-js';
-import { handleClientStreamingCall, } from '@grpc/grpc-js/build/src/server-call';
+import { handleClientStreamingCall } from '@grpc/grpc-js/build/src/server-call';
 
 import {
   ReactiveServerUnaryResponse,
@@ -8,7 +8,7 @@ import {
   ReactiveServerResponseStreamMethod,
   ReactiveServerBidirectionalStreamMethod,
 } from './server_methods';
-import { observableFromStream, } from '../observable_from_stream';
+import { observableFromStream } from '../observable_from_stream';
 
 /**
  * Calls the specified callback after the promise has finished based on the
