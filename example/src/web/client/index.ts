@@ -1,36 +1,40 @@
 import * as grpc from 'grpc-web';
+import { map, take } from 'reactive-grpc/node_modules/rxjs/operators/';
 
-import { ExampleClient, ExamplePromiseClient } from '../generated/service_grpc_web_pb';
-import { TwoNumbers } from '../generated/service_pb';
+import { reactifyWebClient } from 'reactive-grpc/build/web';
+
+import { ExampleClient } from '../generated/service_grpc_web_pb';
+import { Empty, TwoNumbers } from '../generated/service_pb';
 
 async function testServer(port: string) {
   console.log(`Testing server "${port}":`);
-  const client = new ExamplePromiseClient(port);
-  console.log((await client.addTwoNumbers(new TwoNumbers().setA(5).setB(6))).getA());
+  const client = new ExampleClient(port);
+  const reactiveClient = reactifyWebClient(client);
 
-  // async function addTwoNumbersTest(a: number, b: number) {
-  //   console.log(`Testing addTwoNumbers with a=${a} and b=${b}...`);
-  //   const response = await reactiveClient.addTwoNumbers(
-  //     new TwoNumbers().setA(a).setB(b)
-  //   );
-  //   console.log(`Result: ${response.getA()}`);
-  // }
+  async function addTwoNumbersTest(a: number, b: number) {
+    console.log(`Testing addTwoNumbers with a=${a} and b=${b}...`);
+    const response = await reactiveClient.addTwoNumbers(
+      new TwoNumbers().setA(a).setB(b)
+    );
+    console.log(`Result: ${response.getA()}`);
+  }
 
-  // async function getFibonacciSequenceTest(count: number) {
-  //   console.log(`Testing getFibonacciSequence with ${count} numbers...`);
-  //   const response = reactiveClient.getFibonacciSequence(new Empty());
-  //   process.stdout.write("Result: ");
-  //   await response
-  //     .pipe(
-  //       take(count),
-  //       map((value) => process.stdout.write(`${value} `))
-  //     )
-  //     .toPromise();
-  //   console.log("");
-  // }
+  async function getFibonacciSequenceTest(count: number) {
+    console.log(`Testing getFibonacciSequence with ${count} numbers...`);
+    const response = reactiveClient.getFibonacciSequence(new Empty());
+    console.log('got observable');
+    console.log("Result: ");
+    await response
+      .pipe(
+        take(count),
+        map((value) => console.log(`${value} `))
+      )
+      .toPromise();
+    console.log("");
+  }
 
-  // await addTwoNumbersTest(3, 5);
-  // await getFibonacciSequenceTest(5);
+  await addTwoNumbersTest(3, 5);
+  await getFibonacciSequenceTest(5);
   console.log("");
 }
 

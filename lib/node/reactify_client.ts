@@ -6,7 +6,7 @@ import {
   ReactiveClientResponseStreamMethod,
   ReactiveClientBidirectionalStreamMethod,
 } from "./client_methods";
-import { observableFromClientStream } from "./observable_from_stream";
+import { observableFromStream } from "../observable_from_stream";
 
 /**
  * Mapped type that transforms all gRPC method signatures within the gRPC client
@@ -126,7 +126,7 @@ function reactifyResponseStreamMethod<RequestType, ResponseType>(
       metadata,
       options
     );
-    const result = observableFromClientStream(call) as ReturnType<
+    const result = observableFromStream(call, true) as ReturnType<
       ReactiveClientResponseStreamMethod<RequestType, ResponseType>
     >;
     result.call = call;
@@ -157,7 +157,7 @@ function reactifyBidirectionalStreamMethod<RequestType, ResponseType>(
       (error) => call.destroy(error),
       () => call.end()
     );
-    const result = observableFromClientStream(call) as ReturnType<
+    const result = observableFromStream(call, true) as ReturnType<
       ReactiveClientBidirectionalStreamMethod<RequestType, ResponseType>
     >;
     result.call = call;

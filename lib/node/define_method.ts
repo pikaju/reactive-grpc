@@ -8,7 +8,7 @@ import {
   ReactiveServerResponseStreamMethod,
   ReactiveServerBidirectionalStreamMethod,
 } from "./server_methods";
-import { observableFromServerStream } from "./observable_from_stream";
+import { observableFromStream } from "../observable_from_stream";
 
 /**
  * Calls the specified callback after the promise has finished based on the
@@ -67,7 +67,7 @@ export function defineRequestStreamMethod<RequestType, ResponseType>(
     call: grpc.ServerReadableStream<RequestType, ResponseType>,
     callback: grpc.sendUnaryData<ResponseType>
   ): void => {
-    const observable = observableFromServerStream<RequestType>(call);
+    const observable = observableFromStream<RequestType>(call);
     handleUnaryResult(callback, method(observable, call));
   };
 }
@@ -102,7 +102,7 @@ export function defineBidirectionalStreamMethod<RequestType, ResponseType>(
   method: ReactiveServerBidirectionalStreamMethod<RequestType, ResponseType>
 ): grpc.handleBidiStreamingCall<RequestType, ResponseType> {
   return (call: grpc.ServerDuplexStream<RequestType, ResponseType>): void => {
-    const observable = observableFromServerStream<RequestType>(call);
+    const observable = observableFromStream<RequestType>(call);
     const result = method(observable, call);
     const subscription = result.subscribe(
       (value) => call.write(value),
