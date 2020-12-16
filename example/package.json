@@ -6,7 +6,7 @@
     "email": "julienscholzo@hotmail.de"
   },
   "files": [
-    "src/**/*"
+    "./dist"
   ],
   "scripts": {
     "generate": "bash generate.sh",

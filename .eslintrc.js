@@ -6,7 +6,7 @@ module.exports = {
   },
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint'],
-  ignorePatterns: ['build', 'generated', 'webpack.config.js'],
+  ignorePatterns: ['dist', 'generated', 'webpack.config.js'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',

@@ -1,7 +1,6 @@
-import * as grpc from 'grpc-web';
 import { map, take } from 'reactive-grpc/node_modules/rxjs/operators/';
 
-import { reactifyWebClient } from 'reactive-grpc/build/web';
+import { reactifyWebClient } from 'reactive-grpc/dist/web';
 
 import { ExampleClient } from '../generated/service_grpc_web_pb';
 import { Empty, TwoNumbers } from '../generated/service_pb';
