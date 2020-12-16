@@ -1,6 +1,6 @@
 import * as grpc from '@grpc/grpc-js';
 
-import { ExampleService, IExampleServer } from '../generated/service_grpc_pb';
+import { ExampleService, IExampleServer, } from '../generated/service_grpc_pb';
 
 import DefineMethodsExampleService from './methods';
 import defineServiceExampleService from './service';

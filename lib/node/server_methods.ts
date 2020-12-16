@@ -1,5 +1,5 @@
 import * as grpc from '@grpc/grpc-js';
-import { Observable } from 'rxjs';
+import { Observable, } from 'rxjs';
 
 /** Optional return value type of reactive server methods with unary responses. */
 export interface ReactiveServerUnaryResponse<ResponseType> {

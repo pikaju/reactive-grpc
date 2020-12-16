@@ -64,7 +64,7 @@ export default defineService<IExampleServer>(ExampleService, {
     return request
       .pipe(
         reduce((acc, value) => acc + value.getA(), 0),
-        map((value) => new OneNumber().setA(value))
+        map((value) => new OneNumber().setA(value)),
       )
       .toPromise();
   },
@@ -98,7 +98,7 @@ If you require advanced functionality from the standard gRPC call objects, such 
 defineService<IExampleServer>(ExampleService, {
   runningAverage(
     request: Observable<OneNumber>,
-    call: grpc.ServerDuplexStream<OneNumber, OneNumber>
+    call: grpc.ServerDuplexStream<OneNumber, OneNumber>,
   ): Observable<OneNumber> {
     ...
   },
@@ -111,7 +111,7 @@ defineService<IExampleServer>(ExampleService, {
     return {
       value: new OneNumber().setA(request.getA() + request.getB()),
       trailer: ...,
-      flags: ...
+      flags: ...,
     };
   },
 }
@@ -140,7 +140,7 @@ export default class ExampleServer implements IExampleServer {
     return request
       .pipe(
         reduce((acc, value) => acc + value.getA(), 0),
-        map((value) => new OneNumber().setA(value))
+        map((value) => new OneNumber().setA(value)),
       )
       .toPromise();
   });
@@ -174,7 +174,7 @@ const observable = reactiveClient.getFibonacciNumbers(new OneNumber().setA(20));
 observable.subscribe(
   (value) => console.log(value.getA()),
   (err) => console.log("Oh no!"), // Handle gRPC errors here.
-  () => console.log("Done!")
+  () => console.log("Done!"),
 );
 ```
 Optionally, you can also supply Metadata and CallOptions as the second and third parameters of the calls.
@@ -191,7 +191,7 @@ const observable = reactiveClient.getFibonacciNumbers(new OneNumber().setA(20));
 observable.pipe(take(5)).subscribe(
   (value) => console.log(value.getA()),
   (err) => console.log('Oh no!'),
-  () => console.log('Done!')
+  () => console.log('Done!'),
 );
 ```
 
@@ -222,7 +222,7 @@ const observable = reactiveClient.getFibonacciNumbers(new OneNumber().setA(20));
 observable.subscribe(
   (value) => console.log(value.getA()),
   (err) => console.log('Oh no!'), // Handle gRPC errors here.
-  () => console.log('Done!')
+  () => console.log('Done!'),
 );
 ```
 Optionally, you can also supply Metadata as the second parameter of the calls.
@@ -239,6 +239,6 @@ const observable = reactiveClient.getFibonacciNumbers(new OneNumber().setA(20));
 observable.pipe(take(5)).subscribe(
   (value) => console.log(value.getA()),
   (err) => console.log('Oh no!'),
-  () => console.log('Done!')
+  () => console.log('Done!'),
 );
 ```
