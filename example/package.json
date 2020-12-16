@@ -13,7 +13,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "demo:node:client": "ts-node src/node/client/",
     "demo:node:server": "ts-node src/node/server/",
-    "demo:web:client": "ts-node src/web/client/"
+    "demo:web:client": "webpack serve"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.2.2",
