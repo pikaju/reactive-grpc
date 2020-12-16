@@ -22,9 +22,7 @@ function handleUnaryResult<ResponseType>(
 ): void {
   result.then(
     (response) => {
-      const unaryResponse = response as ReactiveServerUnaryResponse<
-        ResponseType
-      >;
+      const unaryResponse = response as ReactiveServerUnaryResponse<ResponseType>;
       if (unaryResponse.value)
         callback(
           null,

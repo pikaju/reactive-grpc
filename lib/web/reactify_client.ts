@@ -5,6 +5,7 @@ import {
 } from './client_methods';
 import { observableFromStream } from '../observable_from_stream';
 
+// Helper types for ReactiveClient
 type Methods<ClassType extends Object> = ClassType & Record<string | number| symbol, (...args: unknown[]) => unknown>;
 type ResponseFromStream<T> = T extends grpc.ClientReadableStream<infer G> ? G : never;
 
@@ -19,12 +20,9 @@ type ReactiveClient<ClientType extends Object> = {
     (err: grpc.Error, response: infer ResponseType) => void
   ]
     ? ReactiveWebClientUnaryMethod<RequestType, ResponseType>
-    : Parameters<Methods<ClientType>[rpc]> extends Partial<[
-        infer RequestType,
-        grpc.Metadata | undefined,
-      ]>
+    : Parameters<Methods<ClientType>[rpc]> extends Partial<[infer RequestType, grpc.Metadata | undefined]>
     ? ReactiveWebClientResponseStreamMethod<RequestType, ResponseFromStream<ReturnType<Methods<ClientType>[rpc]>>>
-    : never;
+    : unknown;
 };
 
 /**
@@ -36,10 +34,7 @@ type ReactiveClient<ClientType extends Object> = {
 function reactifyUnaryMethod<RequestType, ResponseType>(
   method: Function
 ): ReactiveWebClientUnaryMethod<RequestType, ResponseType> {
-  return (
-    request: RequestType,
-    metadata?: grpc.Metadata,
-  ) => {
+  return (request: RequestType, metadata?: grpc.Metadata) => {
     let call: grpc.ClientReadableStream<ResponseType>;
     const result = new Promise((resolve, reject) => {
       const callback = (error: unknown, response: ResponseType) => error ? reject(error) : resolve(response);
@@ -62,17 +57,9 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
 function reactifyResponseStreamMethod<RequestType, ResponseType>(
   method: Function
 ): ReactiveWebClientResponseStreamMethod<RequestType, ResponseType> {
-  return (
-    request: RequestType,
-    metadata?: grpc.Metadata,
-  ) => {
-    const call: grpc.ClientReadableStream<ResponseType> = method(
-      request,
-      metadata,
-    );
-    const result = observableFromStream(call) as ReturnType<
-      ReactiveWebClientResponseStreamMethod<RequestType, ResponseType>
-    >;
+  return (request: RequestType, metadata?: grpc.Metadata) => {
+    const call: grpc.ClientReadableStream<ResponseType> = method(request, metadata);
+    const result = observableFromStream(call) as ReturnType<ReactiveWebClientResponseStreamMethod<RequestType, ResponseType>>;
     result.call = call;
     return result;
   };

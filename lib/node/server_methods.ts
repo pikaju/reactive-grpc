@@ -27,10 +27,7 @@ export type ReactiveServerResponseStreamMethod<RequestType, ResponseType> = (
 ) => Observable<ResponseType>;
 
 /** Reactive signature for server methods with streaming request and response types. */
-export type ReactiveServerBidirectionalStreamMethod<
-  RequestType,
-  ResponseType
-> = (
+export type ReactiveServerBidirectionalStreamMethod<RequestType, ResponseType> = (
   request: Observable<RequestType>,
   call: grpc.ServerDuplexStream<RequestType, ResponseType>
 ) => Observable<ResponseType>;

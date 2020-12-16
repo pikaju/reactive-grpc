@@ -11,6 +11,4 @@ export type ReactiveWebClientUnaryMethod<RequestType, ResponseType> = (
 export type ReactiveWebClientResponseStreamMethod<RequestType, ResponseType> = (
   request: RequestType,
   metadata?: grpc.Metadata,
-) => Observable<ResponseType> & {
-  call: grpc.ClientReadableStream<ResponseType>;
-};
+) => Observable<ResponseType> & { call: grpc.ClientReadableStream<ResponseType> };
