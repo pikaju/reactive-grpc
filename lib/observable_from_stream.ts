@@ -20,16 +20,13 @@ interface Stream {
  * unsubscribing from the returned `Observable` will result in the cancellation of the stream.
  * Errors caused by the cancellation will be ignored.
  */
-export function observableFromStream<T>(
-  stream: Stream,
-  cancelOnUnsubscribe?: boolean
-) {
+export function observableFromStream<T>(stream: Stream, cancelOnUnsubscribe?: boolean): Observable<T> {
   return new Observable<T>((subscriber) => {
-    function dataHandler(data: any) {
-      subscriber.next(data);
+    function dataHandler(data: unknown) {
+      subscriber.next(data as T);
     }
 
-    function errorHandler(error: any) {
+    function errorHandler(error: unknown) {
       subscriber.error(error);
     }
 
@@ -46,8 +43,9 @@ export function observableFromStream<T>(
       stream.removeListener("error", errorHandler);
       stream.removeListener("end", endHandler);
       if (cancelOnUnsubscribe && stream.cancel) {
-        // Tollerate cancelling by listening for errors and ignoring them.
-        stream.on("error", () => {});
+        stream.on("error", () => {
+          // Tollerate cancelling by listening for errors and ignoring them.
+        });
         stream.cancel();
       }
     };

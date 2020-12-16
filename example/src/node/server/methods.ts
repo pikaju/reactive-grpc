@@ -37,7 +37,7 @@ export default class ExampleServer implements IExampleServer {
     let b = 1;
     return interval(100).pipe(
       map(() => {
-        let next = a + b;
+        const next = a + b;
         a = b;
         b = next;
         return new OneNumber().setA(a);

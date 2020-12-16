@@ -50,7 +50,7 @@ export function defineUnaryMethod<RequestType, ResponseType>(
     call: grpc.ServerUnaryCall<RequestType, ResponseType>,
     callback: grpc.sendUnaryData<ResponseType>
   ): void => {
-    handleUnaryResult(callback, method(call.request!, call));
+    handleUnaryResult(callback, method(call.request, call));
   };
 }
 
@@ -82,7 +82,7 @@ export function defineResponseStreamMethod<RequestType, ResponseType>(
   method: ReactiveServerResponseStreamMethod<RequestType, ResponseType>
 ): grpc.handleServerStreamingCall<RequestType, ResponseType> {
   return (call: grpc.ServerWritableStream<RequestType, ResponseType>): void => {
-    const result = method(call.request!, call);
+    const result = method(call.request, call);
     const subscription = result.subscribe(
       (value) => call.write(value),
       (error) => call.destroy(error),

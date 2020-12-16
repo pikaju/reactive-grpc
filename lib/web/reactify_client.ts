@@ -5,7 +5,7 @@ import {
 } from "./client_methods";
 import { observableFromStream } from "../observable_from_stream";
 
-type Methods<ClassType extends Object> = ClassType & Record<string | number| symbol, (...args: any) => any>;
+type Methods<ClassType extends Object> = ClassType & Record<string | number| symbol, (...args: unknown[]) => unknown>;
 type ResponseFromStream<T> = T extends grpc.ClientReadableStream<infer G> ? G : never;
 
 /**
@@ -34,7 +34,7 @@ type ReactiveClient<ClientType extends Object> = {
  * @returns A reactive version of the standard method.
  */
 function reactifyUnaryMethod<RequestType, ResponseType>(
-  method: any
+  method: Function
 ): ReactiveWebClientUnaryMethod<RequestType, ResponseType> {
   return (
     request: RequestType,
@@ -42,12 +42,13 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
   ) => {
     let call: grpc.ClientReadableStream<ResponseType>;
     const result = new Promise((resolve, reject) => {
-      const callback = (error: any, response: any) =>
-        error ? reject(error) : resolve(response);
+      const callback = (error: unknown, response: ResponseType) => error ? reject(error) : resolve(response);
       metadata = metadata || {};
       call = method(request, metadata, callback);
     }) as ReturnType<ReactiveWebClientUnaryMethod<RequestType, ResponseType>>;
-    result.call = call!; // Promise executor is executed immediately.
+    // Promise executor is executed immediately.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    result.call = call!;
     return result;
   };
 }
@@ -59,13 +60,13 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
  * @returns A reactive version of the standard method.
  */
 function reactifyResponseStreamMethod<RequestType, ResponseType>(
-  method: any
+  method: Function
 ): ReactiveWebClientResponseStreamMethod<RequestType, ResponseType> {
   return (
     request: RequestType,
     metadata?: grpc.Metadata,
   ) => {
-    let call: grpc.ClientReadableStream<ResponseType> = method(
+    const call: grpc.ClientReadableStream<ResponseType> = method(
       request,
       metadata,
     );
@@ -84,17 +85,17 @@ function reactifyResponseStreamMethod<RequestType, ResponseType>(
  * @returns A reactive client which uses the regular client.
  */
 export function reactifyWebClient<ClientType extends Object>(client: ClientType): ReactiveClient<ClientType> {
-  const reactiveClient: any = {};
+  const reactiveClient = {} as ReactiveClient<ClientType>;
   for (const key of Object.getOwnPropertyNames(Object.getPrototypeOf(client))) {
     if (key === 'constructor') continue;
-    const method = ((client as any)[key] as Function).bind(client);
+    const method = (client as unknown as Record<string, Function>)[key].bind(client);
 
     // Treat methods with a third callback parameter as unary.
     if (method.length === 3) {
-      reactiveClient[key] = reactifyUnaryMethod(method);
+      (reactiveClient as Record<string, Function>)[key] = reactifyUnaryMethod(method);
     } else {
-      reactiveClient[key] = reactifyResponseStreamMethod(method);
+      (reactiveClient as Record<string, Function>)[key] = reactifyResponseStreamMethod(method);
     }
   }
-  return reactiveClient as ReactiveClient<ClientType>;
+  return reactiveClient;
 }

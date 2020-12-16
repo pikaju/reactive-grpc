@@ -39,9 +39,7 @@ type ReactiveServer<IService> = {
         infer ResponseType
       >
     ? ReactiveServerBidirectionalStreamMethod<RequestType, ResponseType>
-    : never;
-} & {
-  [propName: string]: any;
+    : unknown;
 };
 
 /**
@@ -56,17 +54,18 @@ export function defineService<IServer>(
   serviceDefinition: grpc.ServiceDefinition<grpc.UntypedServiceImplementation>,
   service: ReactiveServer<IServer>
 ): IServer {
-  const server: any = {};
+  const server = {} as Record<string, Function>;
   for (const [key, value] of Object.entries(serviceDefinition)) {
+    const method = (service as unknown as Record<string, Function>)[key].bind(service);
     if (!value.requestStream && !value.responseStream) {
-      server[key] = defineUnaryMethod((service as any)[key]);
+      server[key] = defineUnaryMethod(method);
     } else if (value.requestStream && !value.responseStream) {
-      server[key] = defineRequestStreamMethod((service as any)[key]);
+      server[key] = defineRequestStreamMethod(method);
     } else if (!value.requestStream && value.responseStream) {
-      server[key] = defineResponseStreamMethod((service as any)[key]);
+      server[key] = defineResponseStreamMethod(method);
     } else {
-      server[key] = defineBidirectionalStreamMethod((service as any)[key]);
+      server[key] = defineBidirectionalStreamMethod(method);
     }
   }
-  return server as IServer;
+  return server as unknown as IServer;
 }

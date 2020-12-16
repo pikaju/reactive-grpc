@@ -53,7 +53,7 @@ type ReactiveClient<ClientType extends grpc.Client> = {
  * @returns A reactive version of the standard method.
  */
 function reactifyUnaryMethod<RequestType, ResponseType>(
-  method: any
+  method: Function
 ): ReactiveClientUnaryMethod<RequestType, ResponseType> {
   return (
     request: RequestType,
@@ -62,8 +62,7 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
   ) => {
     let call!: grpc.ClientUnaryCall;
     const result = new Promise((resolve, reject) => {
-      const callback = (error: any, response: any) =>
-        error ? reject(error) : resolve(response);
+      const callback = (error: unknown, response: ResponseType) => error ? reject(error) : resolve(response);
       metadata = metadata || new grpc.Metadata();
       if (options) call = method(request, metadata, options, callback);
       else call = method(request, metadata, callback);
@@ -80,29 +79,30 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
  * @returns A reactive version of the standard method.
  */
 function reactifyRequestStreamMethod<RequestType, ResponseType>(
-  method: any
+  method: Function
 ): ReactiveClientRequestStreamMethod<RequestType, ResponseType> {
   return (
     request: Observable<RequestType>,
     metadata?: grpc.Metadata,
     options?: Partial<grpc.CallOptions>
   ) => {
-    let call!: grpc.ClientWritableStream<RequestType>;
+    let call: grpc.ClientWritableStream<RequestType>;
     const result = new Promise((resolve, reject) => {
-      const callback = (error: any, response: any) =>
-        error ? reject(error) : resolve(response);
+      const callback = (error: unknown, response: ResponseType) => error ? reject(error) : resolve(response);
       metadata = metadata || new grpc.Metadata();
       if (options) call = method(metadata, options, callback);
       else call = method(metadata, callback);
       request.subscribe(
-        (value) => call!.write(value),
-        (error) => call!.destroy(error),
-        () => call!.end()
+        (value) => call.write(value),
+        (error) => call.destroy(error),
+        () => call.end()
       );
     }) as ReturnType<
       ReactiveClientRequestStreamMethod<RequestType, ResponseType>
     >;
-    result.call = call;
+    // Promise executor is executed immediately.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    result.call = call!;
     return result;
   };
 }
@@ -114,14 +114,14 @@ function reactifyRequestStreamMethod<RequestType, ResponseType>(
  * @returns A reactive version of the standard method.
  */
 function reactifyResponseStreamMethod<RequestType, ResponseType>(
-  method: any
+  method: Function
 ): ReactiveClientResponseStreamMethod<RequestType, ResponseType> {
   return (
     request: RequestType,
     metadata?: grpc.Metadata,
     options?: Partial<grpc.CallOptions>
   ) => {
-    let call: grpc.ClientReadableStream<ResponseType> = method(
+    const call: grpc.ClientReadableStream<ResponseType> = method(
       request,
       metadata,
       options
@@ -141,14 +141,14 @@ function reactifyResponseStreamMethod<RequestType, ResponseType>(
  * @returns A reactive version of the standard method.
  */
 function reactifyBidirectionalStreamMethod<RequestType, ResponseType>(
-  method: any
+  method: Function
 ): ReactiveClientBidirectionalStreamMethod<RequestType, ResponseType> {
   return (
     request: Observable<RequestType>,
     metadata?: grpc.Metadata,
     options?: Partial<grpc.CallOptions>
   ) => {
-    let call: grpc.ClientDuplexStream<RequestType, ResponseType> = method(
+    const call: grpc.ClientDuplexStream<RequestType, ResponseType> = method(
       metadata,
       options
     );
@@ -175,24 +175,17 @@ export function reactifyClient<ClientType extends grpc.Client>(
   serviceDefinition: grpc.ServiceDefinition<grpc.UntypedServiceImplementation>,
   client: ClientType
 ): ReactiveClient<ClientType> {
-  const reactiveClient: any = {};
+  const reactiveClient  = {} as ReactiveClient<ClientType>;
   for (const [key, value] of Object.entries(serviceDefinition)) {
+    const method = (client as unknown as Record<string, Function>)[key].bind(client);
     if (!value.requestStream && !value.responseStream) {
-      reactiveClient[key] = reactifyUnaryMethod(
-        (client as any)[key].bind(client)
-      );
+      (reactiveClient as Record<string, Function>)[key] = reactifyUnaryMethod(method);
     } else if (value.requestStream && !value.responseStream) {
-      reactiveClient[key] = reactifyRequestStreamMethod(
-        (client as any)[key].bind(client)
-      );
+      (reactiveClient as Record<string, Function>)[key] = reactifyRequestStreamMethod(method);
     } else if (!value.requestStream && value.responseStream) {
-      reactiveClient[key] = reactifyResponseStreamMethod(
-        (client as any)[key].bind(client)
-      );
+      (reactiveClient as Record<string, Function>)[key] = reactifyResponseStreamMethod(method);
     } else {
-      reactiveClient[key] = reactifyBidirectionalStreamMethod(
-        (client as any)[key].bind(client)
-      );
+      (reactiveClient as Record<string, Function>)[key] = reactifyBidirectionalStreamMethod(method);
     }
   }
   return reactiveClient as ReactiveClient<ClientType>;
