@@ -1,11 +1,11 @@
-import * as grpc from "@grpc/grpc-js";
-import { from } from "rxjs";
-import { map, take } from "rxjs/operators";
+import * as grpc from '@grpc/grpc-js';
+import { from } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 
-import { reactifyClient } from "reactive-grpc";
+import { reactifyClient } from 'reactive-grpc';
 
-import { TwoNumbers, OneNumber, Empty } from "../generated/service_pb";
-import { ExampleClient, ExampleService } from "../generated/service_grpc_pb";
+import { TwoNumbers, OneNumber, Empty } from '../generated/service_pb';
+import { ExampleClient, ExampleService } from '../generated/service_grpc_pb';
 
 async function testServer(port: string) {
   console.log(`Testing server "${port}":`);
@@ -31,14 +31,14 @@ async function testServer(port: string) {
   async function getFibonacciSequenceTest(count: number) {
     console.log(`Testing getFibonacciSequence with ${count} numbers...`);
     const response = reactiveClient.getFibonacciSequence(new Empty());
-    process.stdout.write("Result: ");
+    process.stdout.write('Result: ');
     await response
       .pipe(
         take(count),
         map((value) => process.stdout.write(`${value} `))
       )
       .toPromise();
-    console.log("");
+    console.log('');
   }
 
   async function runningAverageTest(numbers: Array<number>) {
@@ -46,21 +46,21 @@ async function testServer(port: string) {
     const response = reactiveClient.runningAverage(
       from(numbers).pipe(map((value: number) => new OneNumber().setA(value)))
     );
-    process.stdout.write("Result: ");
+    process.stdout.write('Result: ');
     await response
       .pipe(map((value) => process.stdout.write(`${value.getA()} `)))
       .toPromise();
-    console.log("");
+    console.log('');
   }
 
   await addTwoNumbersTest(3, 5);
   await addStreamOfNumbersTest([1, 2, 3, 4]);
   await getFibonacciSequenceTest(5);
   await runningAverageTest([0, 10, 20, 50]);
-  console.log("");
+  console.log('');
 }
 
 (async () => {
-  await testServer("localhost:5001");
-  await testServer("localhost:5002");
+  await testServer('localhost:5001');
+  await testServer('localhost:5002');
 })();

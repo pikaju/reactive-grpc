@@ -1,12 +1,12 @@
-import * as grpc from "@grpc/grpc-js";
-import { Observable } from "rxjs";
+import * as grpc from '@grpc/grpc-js';
+import { Observable } from 'rxjs';
 import {
   ReactiveClientUnaryMethod,
   ReactiveClientRequestStreamMethod,
   ReactiveClientResponseStreamMethod,
   ReactiveClientBidirectionalStreamMethod,
-} from "./client_methods";
-import { observableFromStream } from "../observable_from_stream";
+} from './client_methods';
+import { observableFromStream } from '../observable_from_stream';
 
 /**
  * Mapped type that transforms all gRPC method signatures within the gRPC client

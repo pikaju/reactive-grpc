@@ -1,9 +1,9 @@
-import * as grpc from "grpc-web";
+import * as grpc from 'grpc-web';
 import {
   ReactiveWebClientUnaryMethod,
   ReactiveWebClientResponseStreamMethod,
-} from "./client_methods";
-import { observableFromStream } from "../observable_from_stream";
+} from './client_methods';
+import { observableFromStream } from '../observable_from_stream';
 
 type Methods<ClassType extends Object> = ClassType & Record<string | number| symbol, (...args: unknown[]) => unknown>;
 type ResponseFromStream<T> = T extends grpc.ClientReadableStream<infer G> ? G : never;

@@ -1,12 +1,12 @@
-import { Observable } from "rxjs";
+import { Observable } from 'rxjs';
 
 interface Stream {
   on(
-    event: "data" | "error" | "end",
+    event: 'data' | 'error' | 'end',
     listener: (data: unknown) => void
   ): unknown;
   removeListener(
-    event: "data" | "error" | "end",
+    event: 'data' | 'error' | 'end',
     listener: (data: unknown) => void
   ): unknown;
   cancel?(): void;
@@ -34,16 +34,16 @@ export function observableFromStream<T>(stream: Stream, cancelOnUnsubscribe?: bo
       subscriber.complete();
     }
 
-    stream.on("data", dataHandler);
-    stream.on("error", errorHandler);
-    stream.on("end", endHandler);
+    stream.on('data', dataHandler);
+    stream.on('error', errorHandler);
+    stream.on('end', endHandler);
 
     return () => {
-      stream.removeListener("data", dataHandler);
-      stream.removeListener("error", errorHandler);
-      stream.removeListener("end", endHandler);
+      stream.removeListener('data', dataHandler);
+      stream.removeListener('error', errorHandler);
+      stream.removeListener('end', endHandler);
       if (cancelOnUnsubscribe && stream.cancel) {
-        stream.on("error", () => {
+        stream.on('error', () => {
           // Tollerate cancelling by listening for errors and ignoring them.
         });
         stream.cancel();

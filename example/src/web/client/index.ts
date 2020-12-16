@@ -23,22 +23,22 @@ async function testServer(port: string) {
     console.log(`Testing getFibonacciSequence with ${count} numbers...`);
     const response = reactiveClient.getFibonacciSequence(new Empty());
     console.log('got observable');
-    console.log("Result: ");
+    console.log('Result: ');
     await response
       .pipe(
         take(count),
         map((value) => console.log(`${value} `))
       )
       .toPromise();
-    console.log("");
+    console.log('');
   }
 
   await addTwoNumbersTest(3, 5);
   await getFibonacciSequenceTest(5);
-  console.log("");
+  console.log('');
 }
 
 (async () => {
-  await testServer("http://localhost:4001");
-  await testServer("http://localhost:4002");
+  await testServer('http://localhost:4001');
+  await testServer('http://localhost:4002');
 })();

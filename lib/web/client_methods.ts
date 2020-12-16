@@ -1,5 +1,5 @@
-import * as grpc from "grpc-web";
-import { Observable } from "rxjs";
+import * as grpc from 'grpc-web';
+import { Observable } from 'rxjs';
 
 /** Reactive signature for web client methods with unary request and response types. */
 export type ReactiveWebClientUnaryMethod<RequestType, ResponseType> = (

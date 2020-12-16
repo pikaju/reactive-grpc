@@ -1,9 +1,9 @@
-import * as grpc from "@grpc/grpc-js";
+import * as grpc from '@grpc/grpc-js';
 
-import { ExampleService, IExampleServer } from "../generated/service_grpc_pb";
+import { ExampleService, IExampleServer } from '../generated/service_grpc_pb';
 
-import DefineMethodsExampleService from "./methods";
-import defineServiceExampleService from "./service";
+import DefineMethodsExampleService from './methods';
+import defineServiceExampleService from './service';
 
 async function launchServer(service: IExampleServer, port: string) {
   const server = new grpc.Server();
@@ -19,7 +19,7 @@ async function launchServer(service: IExampleServer, port: string) {
 }
 
 (async () => {
-  await launchServer(new DefineMethodsExampleService(), "0.0.0.0:5001");
-  await launchServer(defineServiceExampleService, "0.0.0.0:5002");
-  console.log("Servers running.");
+  await launchServer(new DefineMethodsExampleService(), '0.0.0.0:5001');
+  await launchServer(defineServiceExampleService, '0.0.0.0:5002');
+  console.log('Servers running.');
 })();

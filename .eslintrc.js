@@ -12,6 +12,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
   ],
   rules: {
+    'quotes': ['error', 'single'],
     '@typescript-eslint/ban-types': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
   },

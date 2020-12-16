@@ -1,18 +1,18 @@
-import * as grpc from "@grpc/grpc-js";
-import { handleClientStreamingCall } from "@grpc/grpc-js/build/src/server-call";
+import * as grpc from '@grpc/grpc-js';
+import { handleClientStreamingCall } from '@grpc/grpc-js/build/src/server-call';
 
 import {
   ReactiveServerUnaryMethod,
   ReactiveServerRequestStreamMethod,
   ReactiveServerResponseStreamMethod,
   ReactiveServerBidirectionalStreamMethod,
-} from "./server_methods";
+} from './server_methods';
 import {
   defineUnaryMethod,
   defineRequestStreamMethod,
   defineResponseStreamMethod,
   defineBidirectionalStreamMethod,
-} from "./define_method";
+} from './define_method';
 
 /**
  * Mapped type that transforms all gRPC method signatures within the `IService` template type

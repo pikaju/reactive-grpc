@@ -1,5 +1,5 @@
-import * as grpc from "@grpc/grpc-js";
-import { handleClientStreamingCall } from "@grpc/grpc-js/build/src/server-call";
+import * as grpc from '@grpc/grpc-js';
+import { handleClientStreamingCall } from '@grpc/grpc-js/build/src/server-call';
 
 import {
   ReactiveServerUnaryResponse,
@@ -7,8 +7,8 @@ import {
   ReactiveServerRequestStreamMethod,
   ReactiveServerResponseStreamMethod,
   ReactiveServerBidirectionalStreamMethod,
-} from "./server_methods";
-import { observableFromStream } from "../observable_from_stream";
+} from './server_methods';
+import { observableFromStream } from '../observable_from_stream';
 
 /**
  * Calls the specified callback after the promise has finished based on the
@@ -88,7 +88,7 @@ export function defineResponseStreamMethod<RequestType, ResponseType>(
       (error) => call.destroy(error),
       () => call.end()
     );
-    call.on("cancelled", () => subscription.unsubscribe());
+    call.on('cancelled', () => subscription.unsubscribe());
   };
 }
 
@@ -109,6 +109,6 @@ export function defineBidirectionalStreamMethod<RequestType, ResponseType>(
       (error) => call.destroy(error),
       () => call.end()
     );
-    call.on("cancelled", () => subscription.unsubscribe());
+    call.on('cancelled', () => subscription.unsubscribe());
   };
 }
