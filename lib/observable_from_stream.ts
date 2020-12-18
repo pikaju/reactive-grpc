@@ -1,22 +1,32 @@
-import { Observable } from "rxjs";
-import * as grpc from "@grpc/grpc-js";
+import { Observable } from 'rxjs';
+
+interface Stream {
+  on(
+    event: 'data' | 'error' | 'end',
+    listener: (data: unknown) => void
+  ): unknown;
+  removeListener(
+    event: 'data' | 'error' | 'end',
+    listener: (data: unknown) => void
+  ): unknown;
+  cancel?(): void;
+}
 
 /**
  * Maps a regular stream object onto an RxJS `Observable` for the client to read.
  * Only `"data"`, `"error"` and `"end"` events will be transformed.
- * Subscribing to, and subsequently unsubscribing from the returned `Observable`
- * will result in the cancellation of the stream.
  * @param stream The stream to be transformed into an `Observable`.
+ * @param cancelOnUnsubscribe If set to true, subscribing to, and subsequently
+ * unsubscribing from the returned `Observable` will result in the cancellation of the stream.
+ * Errors caused by the cancellation will be ignored.
  */
-export function observableFromClientStream<T>(
-  stream: grpc.ClientReadableStream<T> | grpc.ClientDuplexStream<any, T>
-) {
+export function observableFromStream<T>(stream: Stream, cancelOnUnsubscribe?: boolean): Observable<T> {
   return new Observable<T>((subscriber) => {
-    function dataHandler(data: any) {
-      subscriber.next(data);
+    function dataHandler(data: unknown) {
+      subscriber.next(data as T);
     }
 
-    function errorHandler(error: any) {
+    function errorHandler(error: unknown) {
       subscriber.error(error);
     }
 
@@ -24,50 +34,20 @@ export function observableFromClientStream<T>(
       subscriber.complete();
     }
 
-    stream.on("data", dataHandler);
-    stream.on("error", errorHandler);
-    stream.on("end", endHandler);
+    stream.on('data', dataHandler);
+    stream.on('error', errorHandler);
+    stream.on('end', endHandler);
 
     return () => {
-      stream.removeListener("data", dataHandler);
-      stream.removeListener("error", errorHandler);
-      stream.removeListener("end", endHandler);
-      // Tollerate cancelling by listening for errors and ignoring them.
-      stream.on("error", () => {});
-      stream.cancel();
-    };
-  });
-}
-
-/**
- * Maps a regular stream object onto an RxJS `Observable` for the server to read.
- * Only `"data"`, `"error"` and `"end"` events will be transformed.
- * @param stream The stream to be transformed into an `Observable`.
- */
-export function observableFromServerStream<T>(
-  stream: grpc.ServerReadableStream<T, any> | grpc.ServerDuplexStream<T, any>
-) {
-  return new Observable<T>((subscriber) => {
-    function dataHandler(data: any) {
-      subscriber.next(data);
-    }
-
-    function errorHandler(error: any) {
-      subscriber.error(error);
-    }
-
-    function endHandler() {
-      subscriber.complete();
-    }
-
-    stream.on("data", dataHandler);
-    stream.on("error", errorHandler);
-    stream.on("end", endHandler);
-
-    return () => {
-      stream.removeListener("data", dataHandler);
-      stream.removeListener("error", errorHandler);
-      stream.removeListener("end", endHandler);
+      stream.removeListener('data', dataHandler);
+      stream.removeListener('error', errorHandler);
+      stream.removeListener('end', endHandler);
+      if (cancelOnUnsubscribe && stream.cancel) {
+        stream.on('error', () => {
+          // Tollerate cancelling by listening for errors and ignoring them.
+        });
+        stream.cancel();
+      }
     };
   });
 }
