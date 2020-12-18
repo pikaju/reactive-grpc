@@ -2,10 +2,14 @@
   "compilerOptions": {
     "target": "es2017",
     "module": "commonjs",
-    "declaration": true,
-    "outDir": "./build",
+    "outDir": "./dist",
     "strict": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
