@@ -44,7 +44,7 @@ export function observableFromStream<T>(stream: Stream, cancelOnUnsubscribe?: bo
       stream.removeListener('end', endHandler);
       if (cancelOnUnsubscribe && stream.cancel) {
         stream.on('error', () => {
-          // Tollerate cancelling by listening for errors and ignoring them.
+          // Tolerate cancelling by listening for errors and ignoring them.
         });
         stream.cancel();
       }

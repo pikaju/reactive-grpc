@@ -7,10 +7,10 @@ Works well in conjunction with [grpc-tools](https://www.npmjs.com/package/grpc-t
 ```typescript
 class ExampleService implements IExampleServer {
   incrementStream(call: grpc.ServerDuplexStream<OneNumber, OneNumber>): void {
-    call.on("data", (number) => {
+    call.on('data', (number) => {
       call.write(new OneNumber().setA(number.getA() + 1));
     });
-    call.on("end", () => call.end());
+    call.on('end', () => call.end());
   }
 }
 ```
