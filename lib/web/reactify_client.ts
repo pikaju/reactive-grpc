@@ -13,7 +13,7 @@ type ResponseFromStream<T> = T extends grpc.ClientReadableStream<infer G> ? G : 
  * Mapped type that transforms all gRPC method signatures within the gRPC client
  * into their reactive counterparts.
  */
-type ReactiveClient<ClientType extends Object> = {
+export type ReactiveClient<ClientType extends Object> = {
   [rpc in keyof ClientType]: Parameters<Methods<ClientType>[rpc]> extends [
     infer RequestType,
     grpc.Metadata | undefined,

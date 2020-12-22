@@ -12,7 +12,7 @@ import { observableFromStream } from '../observable_from_stream';
  * Mapped type that transforms all gRPC method signatures within the gRPC client
  * into their reactive counterparts.
  */
-type ReactiveClient<ClientType extends grpc.Client> = {
+export type ReactiveClient<ClientType extends grpc.Client> = {
   [rpc in keyof ClientType]: ClientType[rpc] extends (
     metadata: grpc.Metadata,
     options: Partial<grpc.CallOptions>
