@@ -13,7 +13,7 @@ type ResponseFromStream<T> = T extends grpc.ClientReadableStream<infer G> ? G : 
  * Mapped type that transforms all gRPC method signatures within the gRPC client
  * into their reactive counterparts.
  */
-export type ReactiveClient<ClientType extends Object> = {
+export type ReactiveWebClient<ClientType extends Object> = {
   [rpc in keyof ClientType]: Parameters<Methods<ClientType>[rpc]> extends [
     infer RequestType,
     grpc.Metadata | undefined,
@@ -71,8 +71,8 @@ function reactifyResponseStreamMethod<RequestType, ResponseType>(
  * @param client The standard non-reactive gRPC client to be wrapped.
  * @returns A reactive client which uses the regular client.
  */
-export function reactifyWebClient<ClientType extends Object>(client: ClientType): ReactiveClient<ClientType> {
-  const reactiveClient = {} as ReactiveClient<ClientType>;
+export function reactifyWebClient<ClientType extends Object>(client: ClientType): ReactiveWebClient<ClientType> {
+  const reactiveClient = {} as ReactiveWebClient<ClientType>;
   for (const key of Object.getOwnPropertyNames(Object.getPrototypeOf(client))) {
     if (key === 'constructor') continue;
     const method = (client as unknown as Record<string, Function>)[key].bind(client);
