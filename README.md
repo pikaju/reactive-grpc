@@ -160,7 +160,7 @@ export default class ExampleServer implements IExampleServer {
 ```
 
 #### Throwing errors
-gRPC errors can be emitted by throwing instances of the `RpcError` class:
+gRPC errors can be emitted by throwing instances of the `RpcError` class to reject the returned `Promise`:
 ```typescript
 defineService<IExampleServer>(ExampleService, {
   async addTwoNumbers(request: TwoNumbers): Promise<OneNumber> {
