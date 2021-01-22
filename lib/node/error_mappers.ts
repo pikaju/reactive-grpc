@@ -19,7 +19,8 @@ export function toReactiveError(error: unknown): RpcError {
 }
 
 /**
- * Converts a gRPC error provided by this package to an error type understood by gRPC.
+ * Converts a gRPC error provided by this package, or a generic non-gRPC error, to an error type understood by gRPC.
+ * A non-gRPC error is treated as "unknown" and details are discarded due to security concerns.
  * @param error The error to be converted.
  */
 export function toNonReactiveError(error: unknown): {code: number, message: string} {
