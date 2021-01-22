@@ -24,6 +24,18 @@ defineService<IExampleServer>(ExampleService, {
 });
 ```
 
+# Table of Contents
+* [Installation](#installation)
+  * [yarn](#yarn)
+  * [npm](#npm)
+* [Usage](#usage)
+  * [Node.js server implementation](#node.js-server-implementation)
+    * [Reactify an entire service](#reactify-an-entire-service-(recommended))
+    * [Reactify individual methods](#reactify-individual-methods)
+    * [Throwing errors](#throwing-errors)
+  * [Node.js client](#node.js-client)
+  * [Web client](#web-client)
+
 ## Installation
 
 `reactive-grpc` requires `rxjs`, as well as either `@grpc/grpc-js` (for Node.js server applications) or `grpc-web` (for web frontends) to be added to your project.
