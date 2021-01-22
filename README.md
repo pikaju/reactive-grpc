@@ -29,11 +29,11 @@ defineService<IExampleServer>(ExampleService, {
   * [yarn](#yarn)
   * [npm](#npm)
 * [Usage](#usage)
-  * [Node.js server implementation](#node.js-server-implementation)
+  * [Node.js server implementation](#nodejs-server-implementation)
     * [Reactify an entire service](#reactify-an-entire-service-(recommended))
     * [Reactify individual methods](#reactify-individual-methods)
     * [Throwing errors](#throwing-errors)
-  * [Node.js client](#node.js-client)
+  * [Node.js client](#nodejs-client)
   * [Web client](#web-client)
 
 ## Installation
