@@ -21,7 +21,6 @@ async function testServer(port: string) {
   async function getFibonacciSequenceTest(count: number) {
     console.log(`Testing getFibonacciSequence with ${count} numbers...`);
     const response = reactiveClient.getFibonacciSequence(new Empty());
-    console.log('got observable');
     console.log('Result: ');
     await response
       .pipe(
