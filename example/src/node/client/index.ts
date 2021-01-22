@@ -2,7 +2,7 @@ import * as grpc from '@grpc/grpc-js';
 import { from } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
-import { reactifyClient } from 'reactive-grpc';
+import { reactifyClient } from 'reactive-grpc/node';
 
 import { TwoNumbers, OneNumber, Empty } from '../generated/service_pb';
 import { ExampleClient, ExampleService } from '../generated/service_grpc_pb';

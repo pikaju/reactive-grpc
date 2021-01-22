@@ -66,7 +66,7 @@ function reactifyResponseStreamMethod<RequestType, ResponseType>(
 }
 
 /**
- * Wraps a non-reactive gRPC client so that all methods can be called reactively.
+ * Wraps a non-reactive gRPC Web client so that all methods can be called reactively.
  * @param serviceDefinition The gRPC service definition which the client implements.
  * @param client The standard non-reactive gRPC client to be wrapped.
  * @returns A reactive client which uses the regular client.

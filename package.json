@@ -7,8 +7,14 @@
     "email": "julienscholzo@hotmail.de"
   },
   "files": [
-    "./dist"
+    "./dist",
+    "./node",
+    "./web"
   ],
+  "exports": {
+    "./node": "./dist/node/index.js",
+    "./web": "./dist/web/index.js"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {

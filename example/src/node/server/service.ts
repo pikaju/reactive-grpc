@@ -1,7 +1,7 @@
 import { interval, Observable } from 'rxjs';
 import { map, reduce } from 'rxjs/operators';
 
-import { defineService, ReactiveServerUnaryResponse } from 'reactive-grpc';
+import { defineService } from 'reactive-grpc/node';
 
 import { OneNumber, TwoNumbers, Empty } from '../generated/service_pb';
 import { ExampleService, IExampleServer } from '../generated/service_grpc_pb';
