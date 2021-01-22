@@ -4,6 +4,7 @@ import { ExampleService, IExampleServer } from '../generated/service_grpc_pb';
 
 import DefineMethodsExampleService from './methods';
 import defineServiceExampleService from './service';
+import errorExampleService from './error_service';
 
 async function launchServer(service: IExampleServer, port: string) {
   const server = new grpc.Server();
@@ -21,5 +22,6 @@ async function launchServer(service: IExampleServer, port: string) {
 (async () => {
   await launchServer(new DefineMethodsExampleService(), '0.0.0.0:5001');
   await launchServer(defineServiceExampleService, '0.0.0.0:5002');
+  await launchServer(errorExampleService, '0.0.0.0:5003');
   console.log('Servers running.');
 })();
