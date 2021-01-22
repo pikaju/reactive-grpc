@@ -3,7 +3,8 @@ import {
   ReactiveWebClientUnaryMethod,
   ReactiveWebClientResponseStreamMethod,
 } from './client_methods';
-import { observableFromStream } from '../observable_from_stream';
+import { observableFromStream } from '../common/observable_from_stream';
+import { mapObservableErrors, toReactiveError } from './error_mappers';
 
 // Helper types for ReactiveClient
 type Methods<ClassType extends Object> = ClassType & Record<string | number| symbol, (...args: unknown[]) => unknown>;
@@ -37,7 +38,7 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
   return (request: RequestType, metadata?: grpc.Metadata) => {
     let call: grpc.ClientReadableStream<ResponseType>;
     const result = new Promise((resolve, reject) => {
-      const callback = (error: unknown, response: ResponseType) => error ? reject(error) : resolve(response);
+      const callback = (error: unknown, response: ResponseType) => error ? reject(toReactiveError(error)) : resolve(response);
       metadata = metadata || {};
       call = method(request, metadata, callback);
     }) as ReturnType<ReactiveWebClientUnaryMethod<RequestType, ResponseType>>;
@@ -59,14 +60,15 @@ function reactifyResponseStreamMethod<RequestType, ResponseType>(
 ): ReactiveWebClientResponseStreamMethod<RequestType, ResponseType> {
   return (request: RequestType, metadata?: grpc.Metadata) => {
     const call: grpc.ClientReadableStream<ResponseType> = method(request, metadata);
-    const result = observableFromStream(call) as ReturnType<ReactiveWebClientResponseStreamMethod<RequestType, ResponseType>>;
-    result.call = call;
-    return result;
+    const result = mapObservableErrors(observableFromStream(call));
+    const injectedResult = result as ReturnType<ReactiveWebClientResponseStreamMethod<RequestType, ResponseType>>;
+    injectedResult.call = call;
+    return injectedResult;
   };
 }
 
 /**
- * Wraps a non-reactive gRPC client so that all methods can be called reactively.
+ * Wraps a non-reactive gRPC Web client so that all methods can be called reactively.
  * @param serviceDefinition The gRPC service definition which the client implements.
  * @param client The standard non-reactive gRPC client to be wrapped.
  * @returns A reactive client which uses the regular client.

@@ -18,7 +18,7 @@ module.exports = {
           },
         ],
         exclude: [
-          /node_modules/,
+          /reactive-grpc\/node_modules/,
           path.resolve(__dirname, 'src', 'node'),
         ],
       },

@@ -8,7 +8,8 @@ import {
   ReactiveServerResponseStreamMethod,
   ReactiveServerBidirectionalStreamMethod,
 } from './server_methods';
-import { observableFromStream } from '../observable_from_stream';
+import { observableFromStream } from '../common/observable_from_stream';
+import { mapObservableErrors, toNonReactiveError, toReactiveError } from './error_mappers';
 
 /**
  * Calls the specified callback after the promise has finished based on the
@@ -32,7 +33,7 @@ function handleUnaryResult<ResponseType>(
         );
       else callback(null, response as ResponseType);
     },
-    (reason) => callback(reason, null)
+    (error) => callback(toNonReactiveError(error), null)
   );
 }
 
@@ -80,7 +81,7 @@ export function defineResponseStreamMethod<RequestType, ResponseType>(
   method: ReactiveServerResponseStreamMethod<RequestType, ResponseType>
 ): grpc.handleServerStreamingCall<RequestType, ResponseType> {
   return (call: grpc.ServerWritableStream<RequestType, ResponseType>): void => {
-    const result = method(call.request, call);
+    const result = mapObservableErrors(method(call.request, call), toNonReactiveError);
     const subscription = result.subscribe(
       (value) => call.write(value),
       (error) => call.destroy(error),
@@ -101,7 +102,7 @@ export function defineBidirectionalStreamMethod<RequestType, ResponseType>(
 ): grpc.handleBidiStreamingCall<RequestType, ResponseType> {
   return (call: grpc.ServerDuplexStream<RequestType, ResponseType>): void => {
     const observable = observableFromStream<RequestType>(call);
-    const result = method(observable, call);
+    const result = mapObservableErrors(method(observable, call), toNonReactiveError);
     const subscription = result.subscribe(
       (value) => call.write(value),
       (error) => call.destroy(error),

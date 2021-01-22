@@ -1,6 +1,6 @@
-import { map, take } from 'reactive-grpc/node_modules/rxjs/operators/';
+import { map, take } from 'rxjs/operators/';
 
-import { reactifyWebClient } from 'reactive-grpc/dist/web';
+import { reactifyWebClient } from 'reactive-grpc/web';
 
 import { ExampleClient } from '../generated/service_grpc_web_pb';
 import { Empty, TwoNumbers } from '../generated/service_pb';
@@ -21,7 +21,6 @@ async function testServer(port: string) {
   async function getFibonacciSequenceTest(count: number) {
     console.log(`Testing getFibonacciSequence with ${count} numbers...`);
     const response = reactiveClient.getFibonacciSequence(new Empty());
-    console.log('got observable');
     console.log('Result: ');
     await response
       .pipe(
@@ -32,12 +31,13 @@ async function testServer(port: string) {
     console.log('');
   }
 
-  await addTwoNumbersTest(3, 5);
-  await getFibonacciSequenceTest(5);
+  await addTwoNumbersTest(3, 5).catch(console.error);
+  await getFibonacciSequenceTest(5).catch(console.error);
   console.log('');
 }
 
 (async () => {
   await testServer('http://localhost:4001');
   await testServer('http://localhost:4002');
+  await testServer('http://localhost:4003');
 })();
