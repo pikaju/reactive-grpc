@@ -9,8 +9,7 @@ import {
   ReactiveServerBidirectionalStreamMethod,
 } from './server_methods';
 import { observableFromStream } from '../common/observable_from_stream';
-import { toNonReactiveError } from './error_mappers';
-import { throwError } from 'rxjs';
+import { mapObservableErrors, toNonReactiveError, toReactiveError } from './error_mappers';
 
 /**
  * Calls the specified callback after the promise has finished based on the
@@ -82,7 +81,7 @@ export function defineResponseStreamMethod<RequestType, ResponseType>(
   method: ReactiveServerResponseStreamMethod<RequestType, ResponseType>
 ): grpc.handleServerStreamingCall<RequestType, ResponseType> {
   return (call: grpc.ServerWritableStream<RequestType, ResponseType>): void => {
-    const result = method(call.request, call);
+    const result = mapObservableErrors(method(call.request, call), toNonReactiveError);
     const subscription = result.subscribe(
       (value) => call.write(value),
       (error) => call.destroy(error),
@@ -103,7 +102,7 @@ export function defineBidirectionalStreamMethod<RequestType, ResponseType>(
 ): grpc.handleBidiStreamingCall<RequestType, ResponseType> {
   return (call: grpc.ServerDuplexStream<RequestType, ResponseType>): void => {
     const observable = observableFromStream<RequestType>(call);
-    const result = method(observable, call);
+    const result = mapObservableErrors(method(observable, call), toNonReactiveError);
     const subscription = result.subscribe(
       (value) => call.write(value),
       (error) => call.destroy(error),

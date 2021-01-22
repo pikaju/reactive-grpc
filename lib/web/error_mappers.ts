@@ -1,4 +1,6 @@
 import * as grpc from 'grpc-web';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { RpcError } from '../common/error'
 
 /**
@@ -14,4 +16,12 @@ export function toReactiveError(error: unknown): RpcError {
     if (typeof grpcError.message === 'string') message = grpcError.message;
   }
   return new RpcError(code, message);
+}
+
+/**
+ * Maps an observable to a new observable whose errors are converted from gRPC errors to errors defined by this package.
+ * @param observable Observable to be mapped.
+ */
+export function mapObservableErrors<T>(observable: Observable<T>): Observable<T> {
+  return observable.pipe(catchError((err) => throwError(toReactiveError(err))));
 }

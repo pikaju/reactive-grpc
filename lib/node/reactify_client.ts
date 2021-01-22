@@ -7,6 +7,7 @@ import {
   ReactiveClientBidirectionalStreamMethod,
 } from './client_methods';
 import { observableFromStream } from '../common/observable_from_stream';
+import { mapObservableErrors, toReactiveError } from './error_mappers';
 
 /**
  * Mapped type that transforms all gRPC method signatures within the gRPC client
@@ -58,7 +59,7 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
   return (request: RequestType, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
     let call: grpc.ClientUnaryCall;
     const result = new Promise((resolve, reject) => {
-      const callback = (error: unknown, response: ResponseType) => error ? reject(error) : resolve(response);
+      const callback = (error: unknown, response: ResponseType) => error ? reject(toReactiveError(error)) : resolve(response);
       metadata = metadata || new grpc.Metadata();
       if (options) call = method(request, metadata, options, callback);
       else call = method(request, metadata, callback);
@@ -82,7 +83,7 @@ function reactifyRequestStreamMethod<RequestType, ResponseType>(
   return (request: Observable<RequestType>, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
     let call: grpc.ClientWritableStream<RequestType>;
     const result = new Promise((resolve, reject) => {
-      const callback = (error: unknown, response: ResponseType) => error ? reject(error) : resolve(response);
+      const callback = (error: unknown, response: ResponseType) => error ? reject(toReactiveError(error)) : resolve(response);
       metadata = metadata || new grpc.Metadata();
       if (options) call = method(metadata, options, callback);
       else call = method(metadata, callback);
@@ -110,9 +111,10 @@ function reactifyResponseStreamMethod<RequestType, ResponseType>(
 ): ReactiveClientResponseStreamMethod<RequestType, ResponseType> {
   return (request: RequestType, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
     const call: grpc.ClientReadableStream<ResponseType> = method(request, metadata, options);
-    const result = observableFromStream(call, true) as ReturnType<ReactiveClientResponseStreamMethod<RequestType, ResponseType>>;
-    result.call = call;
-    return result;
+    const result = mapObservableErrors(observableFromStream(call, true), toReactiveError);
+    const injectedResult = result as ReturnType<ReactiveClientResponseStreamMethod<RequestType, ResponseType>>;
+    injectedResult.call = call;
+    return injectedResult;
   };
 }
 
@@ -132,9 +134,10 @@ function reactifyBidirectionalStreamMethod<RequestType, ResponseType>(
       (error) => call.destroy(error),
       () => call.end()
     );
-    const result = observableFromStream(call, true) as ReturnType<ReactiveClientBidirectionalStreamMethod<RequestType, ResponseType>>;
-    result.call = call;
-    return result;
+    const result = mapObservableErrors(observableFromStream(call, true), toReactiveError);
+    const injectedResult = result as ReturnType<ReactiveClientBidirectionalStreamMethod<RequestType, ResponseType>>;
+    injectedResult.call = call;
+    return injectedResult;
   };
 }
 

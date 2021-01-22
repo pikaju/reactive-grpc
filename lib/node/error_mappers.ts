@@ -4,6 +4,21 @@ import { catchError } from 'rxjs/operators';
 import { RpcError } from '../common/error'
 
 /**
+ * Converts a non-reactive gRPC error to an error type provided by this package.
+ * @param error The error to be converted.
+ */
+export function toReactiveError(error: unknown): RpcError {
+  let code = RpcError.StatusCode.UNKNOWN;
+  let message = 'Something went wrong.';
+  if (typeof error === 'object' && error != null) {
+    const grpcError = error as grpc.ServiceError;
+    if (typeof grpcError.code === 'number') code = grpcError.code as number;
+    if (typeof grpcError.message === 'string') message = grpcError.message;
+  }
+  return new RpcError(code, message);
+}
+
+/**
  * Converts a gRPC error provided by this package to an error type understood by gRPC.
  * @param error The error to be converted.
  */
@@ -20,6 +35,11 @@ export function toNonReactiveError(error: unknown): {code: number, message: stri
   };
 }
 
-export function mapReactiveObservableErrors<T extends Observable<unknown>>(observable: T): T {
-  return observable.pipe(catchError((err) => throwError(toNonReactiveError(err)))) as T;
+/**
+ * Maps an observable to a new observable whose errors are converted with the help of a mapping function.
+ * @param observable Observable to be mapped.
+ * @param mappingFunction Error type mapping function.
+ */
+export function mapObservableErrors<T>(observable: Observable<T>, mappingFunction: (err: unknown) => unknown): Observable<T> {
+  return observable.pipe(catchError((err) => throwError(mappingFunction(err))));
 }
