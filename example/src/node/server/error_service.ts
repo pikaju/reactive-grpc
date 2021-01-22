@@ -10,7 +10,7 @@ export default defineService<IExampleServer>(ExampleService, {
   async addTwoNumbers(request: TwoNumbers): Promise<OneNumber> {
     throw new RpcError(RpcError.StatusCode.FAILED_PRECONDITION, 'The precondition failed.');
   },
-  addStreamOfNumbers(request: Observable<OneNumber>): Promise<OneNumber> {
+  async addStreamOfNumbers(request: Observable<OneNumber>): Promise<OneNumber> {
     throw new RpcError(RpcError.StatusCode.OUT_OF_RANGE, 'Out of range!');
   },
   getFibonacciSequence(request: Empty): Observable<OneNumber> {

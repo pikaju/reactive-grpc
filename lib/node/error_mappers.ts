@@ -9,13 +9,13 @@ import { RpcError } from '../common/error'
  */
 export function toReactiveError(error: unknown): RpcError {
   let code = RpcError.StatusCode.UNKNOWN;
-  let message = 'Something went wrong.';
+  let details = 'Something went wrong.';
   if (typeof error === 'object' && error != null) {
     const grpcError = error as grpc.ServiceError;
     if (typeof grpcError.code === 'number') code = grpcError.code as number;
-    if (typeof grpcError.message === 'string') message = grpcError.message;
+    if (typeof grpcError.details === 'string') details = grpcError.details;
   }
-  return new RpcError(code, message);
+  return new RpcError(code, details);
 }
 
 /**
@@ -26,7 +26,7 @@ export function toNonReactiveError(error: unknown): {code: number, message: stri
   if (error instanceof RpcError) {
     return {
       code: error.code,
-      message: error.description,
+      message: error.details,
     };
   }
   return {

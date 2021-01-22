@@ -4,9 +4,9 @@
 export class RpcError extends Error {
   constructor(
     public code: RpcError.StatusCode,
-    public description: string,
+    public details: string,
   ) {
-    super(`Status Code ${code} (${RpcError.StatusCode[code]}): "${description}"`);
+    super(`Status Code ${code} (${RpcError.StatusCode[code]}): "${details}"`);
   }
 }
 
