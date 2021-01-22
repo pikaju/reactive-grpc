@@ -8,7 +8,9 @@ import {
   ReactiveServerResponseStreamMethod,
   ReactiveServerBidirectionalStreamMethod,
 } from './server_methods';
-import { observableFromStream } from '../observable_from_stream';
+import { observableFromStream } from '../common/observable_from_stream';
+import { toNonReactiveError } from './error_mappers';
+import { throwError } from 'rxjs';
 
 /**
  * Calls the specified callback after the promise has finished based on the
@@ -32,7 +34,7 @@ function handleUnaryResult<ResponseType>(
         );
       else callback(null, response as ResponseType);
     },
-    (reason) => callback(reason, null)
+    (error) => callback(toNonReactiveError(error), null)
   );
 }
 

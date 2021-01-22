@@ -3,7 +3,7 @@ import {
   ReactiveWebClientUnaryMethod,
   ReactiveWebClientResponseStreamMethod,
 } from './client_methods';
-import { observableFromStream } from '../observable_from_stream';
+import { observableFromStream } from '../common/observable_from_stream';
 
 // Helper types for ReactiveClient
 type Methods<ClassType extends Object> = ClassType & Record<string | number| symbol, (...args: unknown[]) => unknown>;

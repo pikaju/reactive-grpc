@@ -6,7 +6,7 @@ import {
   ReactiveClientResponseStreamMethod,
   ReactiveClientBidirectionalStreamMethod,
 } from './client_methods';
-import { observableFromStream } from '../observable_from_stream';
+import { observableFromStream } from '../common/observable_from_stream';
 
 /**
  * Mapped type that transforms all gRPC method signatures within the gRPC client
