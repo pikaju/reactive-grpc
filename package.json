@@ -1,7 +1,7 @@
 {
   "name": "reactive-grpc",
   "description": "RxJS wrapper for gRPC and TypeScript.",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "author": {
     "name": "Julien Scholz",
     "email": "julienscholzo@hotmail.de"
