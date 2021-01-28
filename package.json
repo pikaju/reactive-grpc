@@ -12,7 +12,7 @@
     "./web"
   ],
   "exports": {
-    "./": "./dist/node/index.js",
+    ".": "./dist/node/index.js",
     "./node": "./dist/node/index.js",
     "./web": "./dist/web/index.js"
   },
