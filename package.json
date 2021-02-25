@@ -1,7 +1,7 @@
 {
   "name": "reactive-grpc",
   "description": "RxJS wrapper for gRPC and TypeScript.",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "author": {
     "name": "Julien Scholz",
     "email": "julienscholzo@hotmail.de"
@@ -12,7 +12,7 @@
     "./web"
   ],
   "exports": {
-    ".": "./dist/node/index.js",
+    ".": "./dist/common/index.js",
     "./node": "./dist/node/index.js",
     "./web": "./dist/web/index.js"
   },
