@@ -8,6 +8,7 @@ import {
 } from './client_methods';
 import { observableFromStream } from '../common/observable_from_stream';
 import { mapObservableErrors, toReactiveError } from './error_mappers';
+import { Metadata } from './metadata';
 
 /**
  * Mapped type that transforms all gRPC method signatures within the gRPC client
@@ -56,13 +57,14 @@ export type ReactiveNodeClient<ClientType extends grpc.Client> = {
 function reactifyUnaryMethod<RequestType, ResponseType>(
   method: Function
 ): ReactiveNodeClientUnaryMethod<RequestType, ResponseType> {
-  return (request: RequestType, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
+  return (request: RequestType, metadata?: Metadata | grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
+    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata || new grpc.Metadata();
+
     let call: grpc.ClientUnaryCall;
     const result = new Promise((resolve, reject) => {
       const callback = (error: unknown, response: ResponseType) => error ? reject(toReactiveError(error)) : resolve(response);
-      metadata = metadata || new grpc.Metadata();
-      if (options) call = method(request, metadata, options, callback);
-      else call = method(request, metadata, callback);
+      if (options) call = method(request, grpcMetadata, options, callback);
+      else call = method(request, grpcMetadata, callback);
     }) as ReturnType<ReactiveNodeClientUnaryMethod<RequestType, ResponseType>>;
     // Promise executor is executed immediately.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -80,13 +82,14 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
 function reactifyRequestStreamMethod<RequestType, ResponseType>(
   method: Function
 ): ReactiveNodeClientRequestStreamMethod<RequestType, ResponseType> {
-  return (request: Observable<RequestType>, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
+  return (request: Observable<RequestType>, metadata?: Metadata | grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
+    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata || new grpc.Metadata();
+
     let call: grpc.ClientWritableStream<RequestType>;
     const result = new Promise((resolve, reject) => {
       const callback = (error: unknown, response: ResponseType) => error ? reject(toReactiveError(error)) : resolve(response);
-      metadata = metadata || new grpc.Metadata();
-      if (options) call = method(metadata, options, callback);
-      else call = method(metadata, callback);
+      if (options) call = method(grpcMetadata, options, callback);
+      else call = method(grpcMetadata, callback);
       request.subscribe(
         (value) => call.write(value),
         (error) => call.destroy(error),
@@ -109,8 +112,9 @@ function reactifyRequestStreamMethod<RequestType, ResponseType>(
 function reactifyResponseStreamMethod<RequestType, ResponseType>(
   method: Function
 ): ReactiveNodeClientResponseStreamMethod<RequestType, ResponseType> {
-  return (request: RequestType, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
-    const call: grpc.ClientReadableStream<ResponseType> = method(request, metadata, options);
+  return (request: RequestType, metadata?: Metadata | grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
+    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata || new grpc.Metadata();
+    const call: grpc.ClientReadableStream<ResponseType> = method(request, grpcMetadata, options);
     const result = mapObservableErrors(observableFromStream(call, true), toReactiveError);
     const injectedResult = result as ReturnType<ReactiveNodeClientResponseStreamMethod<RequestType, ResponseType>>;
     injectedResult.call = call;
@@ -127,8 +131,9 @@ function reactifyResponseStreamMethod<RequestType, ResponseType>(
 function reactifyBidirectionalStreamMethod<RequestType, ResponseType>(
   method: Function
 ): ReactiveNodeClientBidirectionalStreamMethod<RequestType, ResponseType> {
-  return (request: Observable<RequestType>, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
-    const call: grpc.ClientDuplexStream<RequestType, ResponseType> = method(metadata, options);
+  return (request: Observable<RequestType>, metadata?: Metadata | grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
+    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata || new grpc.Metadata();
+    const call: grpc.ClientDuplexStream<RequestType, ResponseType> = method(grpcMetadata, options);
     request.subscribe(
       (value) => call.write(value),
       (error) => call.destroy(error),
