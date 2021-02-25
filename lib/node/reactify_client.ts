@@ -58,7 +58,7 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
   method: Function
 ): ReactiveNodeClientUnaryMethod<RequestType, ResponseType> {
   return (request: RequestType, metadata?: Metadata | grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
-    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata || new grpc.Metadata();
+    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata ?? new grpc.Metadata();
 
     let call: grpc.ClientUnaryCall;
     const result = new Promise((resolve, reject) => {
@@ -83,7 +83,7 @@ function reactifyRequestStreamMethod<RequestType, ResponseType>(
   method: Function
 ): ReactiveNodeClientRequestStreamMethod<RequestType, ResponseType> {
   return (request: Observable<RequestType>, metadata?: Metadata | grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
-    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata || new grpc.Metadata();
+    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata ?? new grpc.Metadata();
 
     let call: grpc.ClientWritableStream<RequestType>;
     const result = new Promise((resolve, reject) => {
@@ -113,7 +113,7 @@ function reactifyResponseStreamMethod<RequestType, ResponseType>(
   method: Function
 ): ReactiveNodeClientResponseStreamMethod<RequestType, ResponseType> {
   return (request: RequestType, metadata?: Metadata | grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
-    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata || new grpc.Metadata();
+    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata ?? new grpc.Metadata();
     const call: grpc.ClientReadableStream<ResponseType> = method(request, grpcMetadata, options);
     const result = mapObservableErrors(observableFromStream(call, true), toReactiveError);
     const injectedResult = result as ReturnType<ReactiveNodeClientResponseStreamMethod<RequestType, ResponseType>>;
@@ -132,7 +132,7 @@ function reactifyBidirectionalStreamMethod<RequestType, ResponseType>(
   method: Function
 ): ReactiveNodeClientBidirectionalStreamMethod<RequestType, ResponseType> {
   return (request: Observable<RequestType>, metadata?: Metadata | grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
-    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata || new grpc.Metadata();
+    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata ?? new grpc.Metadata();
     const call: grpc.ClientDuplexStream<RequestType, ResponseType> = method(grpcMetadata, options);
     request.subscribe(
       (value) => call.write(value),

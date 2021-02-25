@@ -5,6 +5,7 @@ import {
 } from './client_methods';
 import { observableFromStream } from '../common/observable_from_stream';
 import { mapObservableErrors, toReactiveError } from './error_mappers';
+import { Metadata } from './metadata';
 
 // Helper types for ReactiveClient
 type Methods<ClassType extends Object> = ClassType & Record<string | number| symbol, (...args: unknown[]) => unknown>;
@@ -35,12 +36,13 @@ export type ReactiveWebClient<ClientType extends Object> = {
 function reactifyUnaryMethod<RequestType, ResponseType>(
   method: Function
 ): ReactiveWebClientUnaryMethod<RequestType, ResponseType> {
-  return (request: RequestType, metadata?: grpc.Metadata) => {
+  return (request: RequestType, metadata?: Metadata | grpc.Metadata) => {
+    const grpcMetadata: grpc.Metadata = metadata instanceof Metadata ? metadata.toObject() : metadata ?? {}; 
+
     let call: grpc.ClientReadableStream<ResponseType>;
     const result = new Promise((resolve, reject) => {
       const callback = (error: unknown, response: ResponseType) => error ? reject(toReactiveError(error)) : resolve(response);
-      metadata = metadata || {};
-      call = method(request, metadata, callback);
+      call = method(request, grpcMetadata, callback);
     }) as ReturnType<ReactiveWebClientUnaryMethod<RequestType, ResponseType>>;
     // Promise executor is executed immediately.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -58,8 +60,9 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
 function reactifyResponseStreamMethod<RequestType, ResponseType>(
   method: Function
 ): ReactiveWebClientResponseStreamMethod<RequestType, ResponseType> {
-  return (request: RequestType, metadata?: grpc.Metadata) => {
-    const call: grpc.ClientReadableStream<ResponseType> = method(request, metadata);
+  return (request: RequestType, metadata?: Metadata | grpc.Metadata) => {
+    const grpcMetadata: grpc.Metadata = metadata instanceof Metadata ? metadata.toObject() : metadata ?? {}; 
+    const call: grpc.ClientReadableStream<ResponseType> = method(request, grpcMetadata);
     const result = mapObservableErrors(observableFromStream(call));
     const injectedResult = result as ReturnType<ReactiveWebClientResponseStreamMethod<RequestType, ResponseType>>;
     injectedResult.call = call;
