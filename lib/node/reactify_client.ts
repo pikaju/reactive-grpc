@@ -1,30 +1,31 @@
 import * as grpc from '@grpc/grpc-js';
 import { Observable } from 'rxjs';
 import {
-  ReactiveClientUnaryMethod,
-  ReactiveClientRequestStreamMethod,
-  ReactiveClientResponseStreamMethod,
-  ReactiveClientBidirectionalStreamMethod,
+  ReactiveNodeClientUnaryMethod,
+  ReactiveNodeClientRequestStreamMethod,
+  ReactiveNodeClientResponseStreamMethod,
+  ReactiveNodeClientBidirectionalStreamMethod,
 } from './client_methods';
 import { observableFromStream } from '../common/observable_from_stream';
 import { mapObservableErrors, toReactiveError } from './error_mappers';
+import { Metadata } from './metadata';
 
 /**
  * Mapped type that transforms all gRPC method signatures within the gRPC client
  * into their reactive counterparts.
  */
-export type ReactiveClient<ClientType extends grpc.Client> = {
+export type ReactiveNodeClient<ClientType extends grpc.Client> = {
   [rpc in keyof ClientType]: ClientType[rpc] extends (
     metadata: grpc.Metadata,
     options: Partial<grpc.CallOptions>
   ) => grpc.ClientDuplexStream<infer RequestType, infer ResponseType>
-    ? ReactiveClientBidirectionalStreamMethod<RequestType, ResponseType>
+    ? ReactiveNodeClientBidirectionalStreamMethod<RequestType, ResponseType>
     : ClientType[rpc] extends (
         request: infer RequestType,
         metadata: grpc.Metadata,
         options: Partial<grpc.CallOptions>
       ) => grpc.ClientReadableStream<infer ResponseType>
-    ? ReactiveClientResponseStreamMethod<RequestType, ResponseType>
+    ? ReactiveNodeClientResponseStreamMethod<RequestType, ResponseType>
     : ClientType[rpc] extends (
         metadata: grpc.Metadata,
         options: Partial<grpc.CallOptions>,
@@ -33,7 +34,7 @@ export type ReactiveClient<ClientType extends grpc.Client> = {
           response: infer ResponseType
         ) => void
       ) => grpc.ClientWritableStream<infer RequestType>
-    ? ReactiveClientRequestStreamMethod<RequestType, ResponseType>
+    ? ReactiveNodeClientRequestStreamMethod<RequestType, ResponseType>
     : ClientType[rpc] extends (
         request: infer RequestType,
         metadata: grpc.Metadata,
@@ -43,7 +44,7 @@ export type ReactiveClient<ClientType extends grpc.Client> = {
           response: infer ResponseType
         ) => void
       ) => grpc.ClientUnaryCall
-    ? ReactiveClientUnaryMethod<RequestType, ResponseType>
+    ? ReactiveNodeClientUnaryMethod<RequestType, ResponseType>
     : unknown;
 };
 
@@ -55,15 +56,16 @@ export type ReactiveClient<ClientType extends grpc.Client> = {
  */
 function reactifyUnaryMethod<RequestType, ResponseType>(
   method: Function
-): ReactiveClientUnaryMethod<RequestType, ResponseType> {
-  return (request: RequestType, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
+): ReactiveNodeClientUnaryMethod<RequestType, ResponseType> {
+  return (request: RequestType, metadata?: Metadata | grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
+    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata ?? new grpc.Metadata();
+
     let call: grpc.ClientUnaryCall;
     const result = new Promise((resolve, reject) => {
       const callback = (error: unknown, response: ResponseType) => error ? reject(toReactiveError(error)) : resolve(response);
-      metadata = metadata || new grpc.Metadata();
-      if (options) call = method(request, metadata, options, callback);
-      else call = method(request, metadata, callback);
-    }) as ReturnType<ReactiveClientUnaryMethod<RequestType, ResponseType>>;
+      if (options) call = method(request, grpcMetadata, options, callback);
+      else call = method(request, grpcMetadata, callback);
+    }) as ReturnType<ReactiveNodeClientUnaryMethod<RequestType, ResponseType>>;
     // Promise executor is executed immediately.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     result.call = call!;
@@ -79,20 +81,21 @@ function reactifyUnaryMethod<RequestType, ResponseType>(
  */
 function reactifyRequestStreamMethod<RequestType, ResponseType>(
   method: Function
-): ReactiveClientRequestStreamMethod<RequestType, ResponseType> {
-  return (request: Observable<RequestType>, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
+): ReactiveNodeClientRequestStreamMethod<RequestType, ResponseType> {
+  return (request: Observable<RequestType>, metadata?: Metadata | grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
+    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata ?? new grpc.Metadata();
+
     let call: grpc.ClientWritableStream<RequestType>;
     const result = new Promise((resolve, reject) => {
       const callback = (error: unknown, response: ResponseType) => error ? reject(toReactiveError(error)) : resolve(response);
-      metadata = metadata || new grpc.Metadata();
-      if (options) call = method(metadata, options, callback);
-      else call = method(metadata, callback);
+      if (options) call = method(grpcMetadata, options, callback);
+      else call = method(grpcMetadata, callback);
       request.subscribe(
         (value) => call.write(value),
         (error) => call.destroy(error),
         () => call.end()
       );
-    }) as ReturnType<ReactiveClientRequestStreamMethod<RequestType, ResponseType>>;
+    }) as ReturnType<ReactiveNodeClientRequestStreamMethod<RequestType, ResponseType>>;
     // Promise executor is executed immediately.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     result.call = call!;
@@ -108,11 +111,12 @@ function reactifyRequestStreamMethod<RequestType, ResponseType>(
  */
 function reactifyResponseStreamMethod<RequestType, ResponseType>(
   method: Function
-): ReactiveClientResponseStreamMethod<RequestType, ResponseType> {
-  return (request: RequestType, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
-    const call: grpc.ClientReadableStream<ResponseType> = method(request, metadata, options);
+): ReactiveNodeClientResponseStreamMethod<RequestType, ResponseType> {
+  return (request: RequestType, metadata?: Metadata | grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
+    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata ?? new grpc.Metadata();
+    const call: grpc.ClientReadableStream<ResponseType> = method(request, grpcMetadata, options);
     const result = mapObservableErrors(observableFromStream(call, true), toReactiveError);
-    const injectedResult = result as ReturnType<ReactiveClientResponseStreamMethod<RequestType, ResponseType>>;
+    const injectedResult = result as ReturnType<ReactiveNodeClientResponseStreamMethod<RequestType, ResponseType>>;
     injectedResult.call = call;
     return injectedResult;
   };
@@ -126,16 +130,17 @@ function reactifyResponseStreamMethod<RequestType, ResponseType>(
  */
 function reactifyBidirectionalStreamMethod<RequestType, ResponseType>(
   method: Function
-): ReactiveClientBidirectionalStreamMethod<RequestType, ResponseType> {
-  return (request: Observable<RequestType>, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
-    const call: grpc.ClientDuplexStream<RequestType, ResponseType> = method(metadata, options);
+): ReactiveNodeClientBidirectionalStreamMethod<RequestType, ResponseType> {
+  return (request: Observable<RequestType>, metadata?: Metadata | grpc.Metadata, options?: Partial<grpc.CallOptions>) => {
+    const grpcMetadata = metadata instanceof Metadata ? metadata.toGrpcType() : metadata ?? new grpc.Metadata();
+    const call: grpc.ClientDuplexStream<RequestType, ResponseType> = method(grpcMetadata, options);
     request.subscribe(
       (value) => call.write(value),
       (error) => call.destroy(error),
       () => call.end()
     );
     const result = mapObservableErrors(observableFromStream(call, true), toReactiveError);
-    const injectedResult = result as ReturnType<ReactiveClientBidirectionalStreamMethod<RequestType, ResponseType>>;
+    const injectedResult = result as ReturnType<ReactiveNodeClientBidirectionalStreamMethod<RequestType, ResponseType>>;
     injectedResult.call = call;
     return injectedResult;
   };
@@ -147,11 +152,11 @@ function reactifyBidirectionalStreamMethod<RequestType, ResponseType>(
  * @param client The standard non-reactive gRPC client to be wrapped.
  * @returns A reactive client which uses the regular client.
  */
-export function reactifyClient<ClientType extends grpc.Client>(
+export function reactifyNodeClient<ClientType extends grpc.Client>(
   serviceDefinition: grpc.ServiceDefinition<grpc.UntypedServiceImplementation>,
   client: ClientType
-): ReactiveClient<ClientType> {
-  const reactiveClient  = {} as ReactiveClient<ClientType>;
+): ReactiveNodeClient<ClientType> {
+  const reactiveClient  = {} as ReactiveNodeClient<ClientType>;
   for (const [key, value] of Object.entries(serviceDefinition)) {
     const method = (client as unknown as Record<string, Function>)[key].bind(client);
     if (!value.requestStream && !value.responseStream) {
@@ -164,5 +169,5 @@ export function reactifyClient<ClientType extends grpc.Client>(
       (reactiveClient as Record<string, Function>)[key] = reactifyBidirectionalStreamMethod(method);
     }
   }
-  return reactiveClient as ReactiveClient<ClientType>;
+  return reactiveClient;
 }
